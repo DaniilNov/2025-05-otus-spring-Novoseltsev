@@ -4,44 +4,33 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e6bf0bea-1641-4e41-bc24-1c2c4de13ccc" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/2025-05-otus-spring-Novoseltsev.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/checkstyle.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hw01-xml-config/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hw01-xml-config/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hw01-xml-config/src/main/java/ru/otus/hw/Application.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hw01-xml-config/src/main/java/ru/otus/hw/config/AppProperties.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hw01-xml-config/src/main/java/ru/otus/hw/config/TestFileNameProvider.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hw01-xml-config/src/main/java/ru/otus/hw/dao/CsvQuestionDao.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hw01-xml-config/src/main/java/ru/otus/hw/dao/QuestionDao.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hw01-xml-config/src/main/java/ru/otus/hw/dao/dto/AnswerCsvConverter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hw01-xml-config/src/main/java/ru/otus/hw/dao/dto/QuestionDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hw01-xml-config/src/main/java/ru/otus/hw/domain/Answer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hw01-xml-config/src/main/java/ru/otus/hw/domain/Question.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hw01-xml-config/src/main/java/ru/otus/hw/exceptions/QuestionReadException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hw01-xml-config/src/main/java/ru/otus/hw/service/IOService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hw01-xml-config/src/main/java/ru/otus/hw/service/StreamsIOService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hw01-xml-config/src/main/java/ru/otus/hw/service/TestRunnerService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hw01-xml-config/src/main/java/ru/otus/hw/service/TestRunnerServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hw01-xml-config/src/main/java/ru/otus/hw/service/TestService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hw01-xml-config/src/main/java/ru/otus/hw/service/TestServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hw01-xml-config/src/main/resources/questions.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hw01-xml-config/src/main/resources/spring-context.xml" afterDir="false" />
+    <list default="true" id="e6bf0bea-1641-4e41-bc24-1c2c4de13ccc" name="Changes" comment="master commit">
+      <change afterPath="$PROJECT_DIR$/hw01-xml-config/src/test/java/ru/otus/hw/service/TestServiceImplTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hw01-xml-config/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/hw01-xml-config/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hw01-xml-config/src/main/java/ru/otus/hw/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/hw01-xml-config/src/main/java/ru/otus/hw/Application.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hw01-xml-config/src/main/java/ru/otus/hw/dao/CsvQuestionDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/hw01-xml-config/src/main/java/ru/otus/hw/dao/CsvQuestionDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hw01-xml-config/src/main/java/ru/otus/hw/service/TestServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/hw01-xml-config/src/main/java/ru/otus/hw/service/TestServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hw01-xml-config/src/main/resources/spring-context.xml" beforeDir="false" afterPath="$PROJECT_DIR$/hw01-xml-config/src/main/resources/spring-context.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JUnit5 Test Class" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectColorInfo">{
@@ -57,11 +46,19 @@
   "keyToString": {
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Application.Application.executor": "Run",
+    "JUnit.CsvQuestionDaoTest (1).executor": "Run",
+    "JUnit.CsvQuestionDaoTest.executor": "Run",
+    "JUnit.CsvQuestionDaoTest.shouldReadQuestionsFromCsvFileCorrectly.executor": "Run",
+    "JUnit.TestServiceImplTest.executor": "Run",
     "Maven.hw01-xml-config [clean,package].executor": "Run",
+    "Maven.hw01-xml-config [clean].executor": "Run",
+    "Maven.hw01-xml-config [org.apache.maven.plugins:maven-checkstyle-plugin:3.3.1:check].executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary": "JUnit5",
+    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5": "",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/xa86/IdeaProjects/learning-project/2025-05-otus-spring-Novoseltsev/.idea",
+    "last_opened_file_path": "C:/Users/xa86/IdeaProjects/learning-project/2025-05-otus-spring-Novoseltsev",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -79,8 +76,14 @@
       <recent name="C:\Users\xa86\IdeaProjects\learning-project\2025-05-otus-spring-Novoseltsev\.idea" />
       <recent name="C:\Users\xa86\IdeaProjects\learning-project\2025-05-otus-spring-Novoseltsev" />
     </key>
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
+    </key>
+    <key name="CreateTestDialog.RecentsKey">
+      <recent name="ru.otus.hw.service" />
+    </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Application.Application">
     <configuration name="Application" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="ru.otus.hw.Application" />
       <module name="hw01-xml-config" />
@@ -94,9 +97,74 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="CsvQuestionDaoTest (1)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="hw01-xml-config" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="ru.otus.hw.service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="ru.otus.hw.service" />
+      <option name="MAIN_CLASS_NAME" value="ru.otus.hw.service.CsvQuestionDaoTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CsvQuestionDaoTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="hw01-xml-config" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="ru.otus.hw.dao.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="ru.otus.hw.dao" />
+      <option name="MAIN_CLASS_NAME" value="ru.otus.hw.dao.CsvQuestionDaoTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CsvQuestionDaoTest.shouldReadQuestionsFromCsvFileCorrectly" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="hw01-xml-config" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="ru.otus.hw.dao.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="ru.otus.hw.dao" />
+      <option name="MAIN_CLASS_NAME" value="ru.otus.hw.dao.CsvQuestionDaoTest" />
+      <option name="METHOD_NAME" value="shouldReadQuestionsFromCsvFileCorrectly" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TestServiceImplTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="hw01-xml-config" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="ru.otus.hw.service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="ru.otus.hw.service" />
+      <option name="MAIN_CLASS_NAME" value="ru.otus.hw.service.TestServiceImplTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Application.Application" />
+        <item itemvalue="JUnit.CsvQuestionDaoTest (1)" />
+        <item itemvalue="JUnit.CsvQuestionDaoTest" />
+        <item itemvalue="JUnit.CsvQuestionDaoTest.shouldReadQuestionsFromCsvFileCorrectly" />
+        <item itemvalue="JUnit.TestServiceImplTest" />
       </list>
     </recent_temporary>
   </component>
@@ -117,11 +185,26 @@
       <option name="presentableId" value="Default" />
       <updated>1750611118679</updated>
       <workItem from="1750611119919" duration="439000" />
-      <workItem from="1750611570725" duration="1524000" />
+      <workItem from="1750611570725" duration="1977000" />
+      <workItem from="1750613563791" duration="1746000" />
     </task>
+    <task id="LOCAL-00001" summary="master commit">
+      <option name="closed" value="true" />
+      <created>1750613162259</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1750613162259</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="master" />
+    <MESSAGE value="master commit" />
+    <option name="LAST_COMMIT_MESSAGE" value="master commit" />
   </component>
 </project>
