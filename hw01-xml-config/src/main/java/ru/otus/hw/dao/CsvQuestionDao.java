@@ -20,10 +20,6 @@ public class CsvQuestionDao implements QuestionDao {
     public List<Question> findAll() {
         String filename = getFileName();
         try (InputStream inputStream = getResourceStream(filename)) {
-            if (inputStream == null) {
-                throw new QuestionReadException("File not found: " + filename);
-            }
-
             List<QuestionDto> questionDtos = parseCsv(inputStream);
             return convertToDomain(questionDtos);
         } catch (Exception e) {
@@ -39,7 +35,7 @@ public class CsvQuestionDao implements QuestionDao {
         return getClass().getClassLoader().getResourceAsStream(filename);
     }
 
-    private List<QuestionDto> parseCsv(InputStream inputStream) throws Exception {
+    private List<QuestionDto> parseCsv(InputStream inputStream) {
         return new CsvToBeanBuilder<QuestionDto>(new InputStreamReader(inputStream))
                 .withType(QuestionDto.class)
                 .withSeparator(';')
