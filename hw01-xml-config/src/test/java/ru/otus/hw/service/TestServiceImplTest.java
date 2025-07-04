@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TestServiceImplTest {
+    private static final String LS = System.lineSeparator();
 
     @Mock
     private IOService ioService;
@@ -36,12 +37,10 @@ class TestServiceImplTest {
 
         testService.executeTest();
 
-        String expectedOutput = """
-                Is it a test question?
-                 - Yes
-                 - No
-
-                """;
+        String expectedOutput = "Is it a test question?" + LS +
+                " - Yes" + LS +
+                " - No" + LS +
+                LS;
 
         InOrder inOrder = Mockito.inOrder(ioService);
         inOrder.verify(ioService).printLine(expectedOutput);

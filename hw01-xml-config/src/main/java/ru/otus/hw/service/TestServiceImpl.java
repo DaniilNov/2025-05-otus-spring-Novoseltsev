@@ -9,6 +9,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class TestServiceImpl implements TestService {
+    private static final String LS = System.lineSeparator();
 
     private final IOService ioService;
 
@@ -25,13 +26,13 @@ public class TestServiceImpl implements TestService {
 
     private String formatQuestion(Question question) {
         StringBuilder sb = new StringBuilder();
-        sb.append(question.text()).append("\n");
+        sb.append(question.text()).append(LS);
 
         for (Answer answer : question.answers()) {
-            sb.append(" - ").append(answer.text()).append("\n");
+            sb.append(" - ").append(answer.text()).append(LS);
         }
 
-        sb.append("\n");
+        sb.append(LS);
         return sb.toString();
     }
 }
