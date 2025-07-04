@@ -30,7 +30,7 @@
         <constructor-arg ref="exceptionHandler"/>
     </bean>
 
-    <bean id="exceptionHandler" class="ru.otus.hw.exceptions.LoggingExceptionHandler">
+    <bean id="exceptionHandler" class="ru.otus.hw.exceptions.CommonExceptionHandler">
         <constructor-arg ref="ioService"/>
     </bean>
 </beans>
