@@ -29,4 +29,6 @@
         <constructor-arg ref="testService"/>
     </bean>
 
+    <bean id="exceptionHandler" class="ru.otus.hw.exceptions.ConsoleExceptionHandler"/>
+
 </beans>

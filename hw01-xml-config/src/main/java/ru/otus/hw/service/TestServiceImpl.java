@@ -17,13 +17,21 @@ public class TestServiceImpl implements TestService {
     @Override
     public void executeTest() {
         List<Question> questions = questionDao.findAll();
-
         for (Question question : questions) {
-            ioService.printLine(question.text());
-            for (Answer answer : question.answers()) {
-                ioService.printFormattedLine(" - %s", answer.text());
-            }
-            ioService.printLine("");
+            String formattedQuestion = formatQuestion(question);
+            ioService.printLine(formattedQuestion);
         }
+    }
+
+    private String formatQuestion(Question question) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(question.text()).append("\n");
+
+        for (Answer answer : question.answers()) {
+            sb.append(" - ").append(answer.text()).append("\n");
+        }
+
+        sb.append("\n");
+        return sb.toString();
     }
 }

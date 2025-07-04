@@ -24,14 +24,11 @@ class TestServiceImplTest {
     private QuestionDao questionDao;
 
     @Test
-    void shouldPrintQuestionsAndAnswers() {
-        List<Answer> answers = List.of(
-                new Answer("Yes", true),
-                new Answer("No", false)
-        );
-        List<Question> questions = List.of(
-                new Question("Is it a test question?", answers)
-        );
+    void shouldPrintQuestionsAndAnswersCorrectly() {
+        Answer answer1 = new Answer("Yes", true);
+        Answer answer2 = new Answer("No", false);
+        Question question = new Question("Is it a test question?", List.of(answer1, answer2));
+        List<Question> questions = List.of(question);
 
         when(questionDao.findAll()).thenReturn(questions);
 
@@ -39,11 +36,14 @@ class TestServiceImplTest {
 
         testService.executeTest();
 
-        InOrder inOrder = Mockito.inOrder(ioService);
-        inOrder.verify(ioService).printLine("Is it a test question?");
-        inOrder.verify(ioService).printFormattedLine(" - %s", "Yes");
-        inOrder.verify(ioService).printFormattedLine(" - %s", "No");
-        inOrder.verify(ioService).printLine("");
-    }
+        String expectedOutput = """
+                Is it a test question?
+                 - Yes
+                 - No
 
+                """;
+
+        InOrder inOrder = Mockito.inOrder(ioService);
+        inOrder.verify(ioService).printLine(expectedOutput);
+    }
 }
