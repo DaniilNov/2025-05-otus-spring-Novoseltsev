@@ -33,7 +33,7 @@ class TestServiceImplTest {
 
         when(questionDao.findAll()).thenReturn(questions);
 
-        TestServiceImpl testService = new TestServiceImpl(ioService, questionDao);
+        var testService = new TestServiceImpl(ioService, questionDao);
 
         testService.executeTest();
 

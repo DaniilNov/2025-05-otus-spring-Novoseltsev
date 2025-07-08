@@ -27,10 +27,7 @@
 
     <bean id="testRunnerService" class="ru.otus.hw.service.TestRunnerServiceImpl">
         <constructor-arg ref="testService"/>
-        <constructor-arg ref="exceptionHandler"/>
-    </bean>
-
-    <bean id="exceptionHandler" class="ru.otus.hw.exceptions.CommonExceptionHandler">
         <constructor-arg ref="ioService"/>
     </bean>
+
 </beans>

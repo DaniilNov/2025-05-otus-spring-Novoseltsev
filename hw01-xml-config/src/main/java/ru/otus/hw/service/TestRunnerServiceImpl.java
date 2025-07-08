@@ -1,21 +1,24 @@
 package ru.otus.hw.service;
 
 import lombok.RequiredArgsConstructor;
-import ru.otus.hw.exceptions.ExceptionHandler;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 public class TestRunnerServiceImpl implements TestRunnerService {
 
     private final TestService testService;
 
-    private final ExceptionHandler exceptionHandler;
+    private final IOService ioService;
 
     @Override
     public void run() {
         try {
             testService.executeTest();
         } catch (Exception e) {
-            exceptionHandler.handle(e);
+            String userMessage = "An error occurred. Please try again later.";
+            log.error("Error: {}", e.getMessage(), e);
+            ioService.printLine(userMessage);
         }
     }
 }
