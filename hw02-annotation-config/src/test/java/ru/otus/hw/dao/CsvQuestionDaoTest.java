@@ -1,7 +1,10 @@
 package ru.otus.hw.dao;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import ru.otus.hw.config.TestFileNameProvider;
 import ru.otus.hw.domain.Answer;
 import ru.otus.hw.domain.Question;
@@ -12,15 +15,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class CsvQuestionDaoTest {
+
+    @Mock
+    private TestFileNameProvider fileNameProvider;
+
+    private CsvQuestionDao dao;
+
+    @BeforeEach
+    void setUp() {
+        when(fileNameProvider.getTestFileName()).thenReturn("test-questions.csv");
+        dao = new CsvQuestionDao(fileNameProvider);
+    }
 
     @Test
     void findAll_ShouldParseAllQuestionsCorrectly() {
-        TestFileNameProvider fileNameProvider = Mockito.mock(TestFileNameProvider.class);
-        when(fileNameProvider.getTestFileName()).thenReturn("test-questions.csv");
-
-        CsvQuestionDao dao = new CsvQuestionDao(fileNameProvider);
-
         List<Question> questions = dao.findAll();
 
         assertThat(questions).hasSize(6);
@@ -52,10 +62,6 @@ class CsvQuestionDaoTest {
 
     @Test
     void findAll_ShouldSkipFirstCommentLine() {
-        TestFileNameProvider fileNameProvider = Mockito.mock(TestFileNameProvider.class);
-        when(fileNameProvider.getTestFileName()).thenReturn("test-questions.csv");
-
-        CsvQuestionDao dao = new CsvQuestionDao(fileNameProvider);
         List<Question> questions = dao.findAll();
 
         assertThat(questions)
