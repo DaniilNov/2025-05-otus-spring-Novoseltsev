@@ -3,5 +3,8 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/hw01-xml-config/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/hw01-xml-config/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hw02-annotation-config/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hw02-annotation-config/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hw03-spring-boot/src/main/java" charset="UTF-8" />
   </component>
 </project>

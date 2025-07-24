@@ -5,6 +5,8 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/hw01-xml-config/pom.xml" />
+        <option value="$PROJECT_DIR$/hw02-annotation-config/pom.xml" />
+        <option value="$PROJECT_DIR$/hw03-spring-boot/pom.xml" />
       </list>
     </option>
   </component>
