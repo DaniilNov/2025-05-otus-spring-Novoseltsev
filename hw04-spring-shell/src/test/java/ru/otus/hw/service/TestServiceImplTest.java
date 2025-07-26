@@ -18,13 +18,8 @@ import java.util.List;
 
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = TestServiceImplTest.TestConfig.class)
+@SpringBootTest(classes = TestServiceImpl.class)
 class TestServiceImplTest {
-
-    @Configuration
-    @Import(TestServiceImpl.class)
-    public static class TestConfig {
-    }
 
     @MockitoBean
     private LocalizedIOService ioService;

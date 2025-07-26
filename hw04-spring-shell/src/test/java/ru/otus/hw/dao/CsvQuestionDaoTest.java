@@ -18,13 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 
-@SpringBootTest(classes = CsvQuestionDaoTest.TestConfig.class)
+@SpringBootTest(classes = CsvQuestionDao.class)
 class CsvQuestionDaoTest {
-
-    @Configuration
-    @Import(CsvQuestionDao.class)
-    public static class TestConfig {
-    }
 
     @MockitoBean
     private TestFileNameProvider fileNameProvider;
