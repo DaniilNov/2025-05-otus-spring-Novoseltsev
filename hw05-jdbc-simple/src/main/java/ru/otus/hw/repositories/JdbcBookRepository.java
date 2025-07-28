@@ -16,73 +16,43 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Repository
 public class JdbcBookRepository implements BookRepository {
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    private final AuthorRepository authorRepository;
-
-    private final GenreRepository genreRepository;
-
-
     @Autowired
-    public JdbcBookRepository(NamedParameterJdbcTemplate jdbcTemplate,
-                              AuthorRepository authorRepository,
-                              GenreRepository genreRepository) {
+    public JdbcBookRepository(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.authorRepository = authorRepository;
-        this.genreRepository = genreRepository;
     }
 
     @Override
     public Optional<Book> findById(long id) {
         var params = Map.of("id", id);
-        Optional<Book> bookOptional = jdbcTemplate.query(
-                "SELECT id, title, author_id, genre_id FROM books WHERE id = :id",
+        return jdbcTemplate.query(
+                "SELECT b.id, b.title, " +
+                        "a.id as author_id, a.full_name as author_name, " +
+                        "g.id as genre_id, g.name as genre_name " +
+                        "FROM books b " +
+                        "JOIN authors a ON b.author_id = a.id " +
+                        "JOIN genres g ON b.genre_id = g.id " +
+                        "WHERE b.id = :id",
                 params,
                 new BookRowMapper()
         ).stream().findFirst();
-
-        bookOptional.ifPresent(book -> {
-            Author author = authorRepository.findById(book.getAuthor().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Author not found"));
-            book.setAuthor(author);
-
-            Genre genre = genreRepository.findById(book.getGenre().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Genre not found"));
-            book.setGenre(genre);
-        });
-
-        return bookOptional;
     }
 
     @Override
     public List<Book> findAll() {
-        var books = jdbcTemplate.query(
-                "SELECT id, title, author_id, genre_id FROM books",
+        return jdbcTemplate.query(
+                "SELECT b.id, b.title, " +
+                        "a.id as author_id, a.full_name as author_name, " +
+                        "g.id as genre_id, g.name as genre_name " +
+                        "FROM books b " +
+                        "JOIN authors a ON b.author_id = a.id " +
+                        "JOIN genres g ON b.genre_id = g.id",
                 new BookRowMapper()
         );
-
-        var authorIds = books.stream().map(b -> b.getAuthor().getId()).collect(Collectors.toSet());
-        var genreIds = books.stream().map(b -> b.getGenre().getId()).collect(Collectors.toSet());
-
-        var authors = authorRepository.findAllById(authorIds);
-        var genres = genreRepository.findAllById(genreIds);
-
-        books.forEach(book -> {
-            authors.stream()
-                    .filter(a -> a.getId() == book.getAuthor().getId())
-                    .findFirst()
-                    .ifPresent(book::setAuthor);
-
-            genres.stream()
-                    .filter(g -> g.getId() == book.getGenre().getId())
-                    .findFirst()
-                    .ifPresent(book::setGenre);
-        });
-        return books;
     }
 
     @Override
@@ -140,11 +110,15 @@ public class JdbcBookRepository implements BookRepository {
     private static class BookRowMapper implements RowMapper<Book> {
         @Override
         public Book mapRow(ResultSet rs, int rowNum) throws SQLException {
-            var author = new Author();
-            author.setId(rs.getLong("author_id"));
+            var author = new Author(
+                    rs.getLong("author_id"),
+                    rs.getString("author_name")
+            );
 
-            var genre = new Genre();
-            genre.setId(rs.getLong("genre_id"));
+            var genre = new Genre(
+                    rs.getLong("genre_id"),
+                    rs.getString("genre_name")
+            );
 
             return new Book(
                     rs.getLong("id"),

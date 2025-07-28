@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Репозиторий на основе Jdbc для работы с книгами ")
 @JdbcTest
-@Import({JdbcBookRepository.class, JdbcGenreRepository.class, JdbcAuthorRepository.class,})
+@Import({JdbcBookRepository.class})
 class JdbcBookRepositoryTest {
 
     @Autowired
@@ -94,7 +94,7 @@ class JdbcBookRepositoryTest {
                 .isEqualTo(returnedBook);
     }
 
-    @DisplayName("должен удалять книгу по id ")
+    @DisplayName("должен удалять книгу по id")
     @Test
     void shouldDeleteBook() {
         assertThat(repositoryJdbc.findById(1L)).isPresent();
