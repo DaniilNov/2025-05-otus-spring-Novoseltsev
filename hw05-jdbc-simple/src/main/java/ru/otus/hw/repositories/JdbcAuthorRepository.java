@@ -45,16 +45,4 @@ public class JdbcAuthorRepository implements AuthorRepository {
         }
     }
 
-    @Override
-    public List<Author> findAllById(Set<Long> ids) {
-        if (ids.isEmpty()) {
-            return List.of();
-        }
-        var params = Map.of("ids", ids);
-        return jdbcTemplate.query(
-                "SELECT id, full_name FROM authors WHERE id IN (:ids)",
-                params,
-                new AuthorRowMapper()
-        );
-    }
 }

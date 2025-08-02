@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 @Repository
 public class JdbcGenreRepository implements GenreRepository {
@@ -42,18 +41,5 @@ public class JdbcGenreRepository implements GenreRepository {
         public Genre mapRow(ResultSet rs, int rowNum) throws SQLException {
             return new Genre(rs.getLong("id"), rs.getString("name"));
         }
-    }
-
-    @Override
-    public List<Genre> findAllById(Set<Long> ids) {
-        if (ids.isEmpty()) {
-            return List.of();
-        }
-        var params = Map.of("ids", ids);
-        return jdbcTemplate.query(
-                "SELECT id, name FROM genres WHERE id IN (:ids)",
-                params,
-                new GenreRowMapper()
-        );
     }
 }

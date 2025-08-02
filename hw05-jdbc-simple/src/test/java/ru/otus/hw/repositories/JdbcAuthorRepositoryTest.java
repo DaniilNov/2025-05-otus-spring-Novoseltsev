@@ -9,7 +9,6 @@ import ru.otus.hw.models.Author;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,21 +42,5 @@ class JdbcAuthorRepositoryTest {
     void shouldReturnEmptyOptionalForNonExistingAuthor() {
         Optional<Author> author = repository.findById(99L);
         assertThat(author).isEmpty();
-    }
-
-    @Test
-    @DisplayName("должен загружать авторов по списку ids")
-    void shouldFindAuthorsByIds() {
-        List<Author> authors = repository.findAllById(Set.of(1L, 3L));
-        assertThat(authors).hasSize(2);
-        assertThat(authors.stream().map(Author::getFullName))
-                .containsExactlyInAnyOrder("Author_1", "Author_3");
-    }
-
-    @Test
-    @DisplayName("должен возвращать пустой список для пустого списка ids")
-    void shouldReturnEmptyListForEmptyIds() {
-        List<Author> authors = repository.findAllById(Set.of());
-        assertThat(authors).isEmpty();
     }
 }

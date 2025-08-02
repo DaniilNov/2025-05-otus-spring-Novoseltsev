@@ -47,13 +47,4 @@ class JdbcGenreRepositoryTest {
         var actualGenre = repositoryJdbc.findById(99L);
         assertThat(actualGenre).isEmpty();
     }
-
-    @Test
-    @DisplayName("должен загружать список жанров по ids")
-    void shouldReturnCorrectGenresByIds() {
-        var actualGenres = repositoryJdbc.findAllById(Set.of(1L, 3L));
-        assertThat(actualGenres).hasSize(2);
-        assertThat(actualGenres.stream().map(Genre::getName).toList())
-                .containsExactlyInAnyOrder("Genre_1", "Genre_3");
-    }
 }

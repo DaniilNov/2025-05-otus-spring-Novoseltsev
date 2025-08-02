@@ -34,8 +34,8 @@ public class JdbcBookRepository implements BookRepository {
                         "a.id as author_id, a.full_name as author_name, " +
                         "g.id as genre_id, g.name as genre_name " +
                         "FROM books b " +
-                        "JOIN authors a ON b.author_id = a.id " +
-                        "JOIN genres g ON b.genre_id = g.id " +
+                        "INNER JOIN authors a ON b.author_id = a.id " +
+                        "INNER JOIN genres g ON b.genre_id = g.id " +
                         "WHERE b.id = :id",
                 params,
                 new BookRowMapper()
@@ -49,8 +49,8 @@ public class JdbcBookRepository implements BookRepository {
                         "a.id as author_id, a.full_name as author_name, " +
                         "g.id as genre_id, g.name as genre_name " +
                         "FROM books b " +
-                        "JOIN authors a ON b.author_id = a.id " +
-                        "JOIN genres g ON b.genre_id = g.id",
+                        "INNER JOIN authors a ON b.author_id = a.id " +
+                        "INNER JOIN genres g ON b.genre_id = g.id",
                 new BookRowMapper()
         );
     }
