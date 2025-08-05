@@ -16,20 +16,13 @@ public class JpaBookRepository implements BookRepository {
 
     @Override
     public Optional<Book> findById(long id) {
-        TypedQuery<Book> query = em.createQuery(
-                "SELECT b FROM Book b " +
-                        "LEFT JOIN FETCH b.author " +
-                        "LEFT JOIN FETCH b.genre " +
-                        "WHERE b.id = :id",
-                Book.class);
-        query.setParameter("id", id);
-        return query.getResultStream().findFirst();
+        return Optional.ofNullable(em.find(Book.class, id));
     }
 
     @Override
     public List<Book> findAll() {
         TypedQuery<Book> query = em.createQuery(
-                "SELECT DISTINCT b FROM Book b " +
+                "SELECT b FROM Book b " +
                         "LEFT JOIN FETCH b.author " +
                         "LEFT JOIN FETCH b.genre",
                 Book.class);

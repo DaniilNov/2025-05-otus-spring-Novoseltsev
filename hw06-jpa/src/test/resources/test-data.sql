@@ -16,4 +16,5 @@ values ('BookTitle_1', 1, 1),
 insert into comments (text, book_id)
 values ('Great book!', 1),
        ('Could be better', 2),
+       ('Good', 2),
        ('Not bad', 3);
