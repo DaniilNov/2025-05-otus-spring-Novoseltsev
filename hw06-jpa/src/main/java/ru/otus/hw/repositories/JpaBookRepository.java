@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import ru.otus.hw.models.Book;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -16,7 +17,12 @@ public class JpaBookRepository implements BookRepository {
 
     @Override
     public Optional<Book> findById(long id) {
-        return Optional.ofNullable(em.find(Book.class, id));
+        return Optional.ofNullable(
+                em.find(Book.class, id, Map.of(
+                        "javax.persistence.fetchgraph",
+                        em.getEntityGraph("Book.withAuthorAndGenre"))
+                )
+        );
     }
 
     @Override
