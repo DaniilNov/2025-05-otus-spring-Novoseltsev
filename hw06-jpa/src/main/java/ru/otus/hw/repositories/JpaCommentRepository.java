@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.springframework.data.jpa.repository.EntityGraph.EntityGraphType.FETCH;
+
 @Repository
 @RequiredArgsConstructor
 public class JpaCommentRepository implements CommentRepository {
@@ -19,7 +21,7 @@ public class JpaCommentRepository implements CommentRepository {
     public Optional<Comment> findById(long id) {
         return Optional.ofNullable(
                 em.find(Comment.class, id, Map.of(
-                        "javax.persistence.fetchgraph",
+                        FETCH.getKey(),
                         em.getEntityGraph("Comment.withBook"))
                 )
         );
