@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import ru.otus.hw.models.Author;
-import ru.otus.hw.repositories.AuthorRepository;
 
 import java.util.List;
 
@@ -21,9 +20,6 @@ class AuthorServiceImplIntegrationTest {
     private AuthorService authorService;
 
     @Autowired
-    private AuthorRepository authorRepository;
-
-    @Autowired
     private MongoTemplate mongoTemplate;
 
     @BeforeEach
@@ -34,8 +30,8 @@ class AuthorServiceImplIntegrationTest {
     @Test
     @DisplayName("должен находить всех авторов")
     void shouldFindAllAuthors() {
-        Author author1 = authorRepository.save(new Author(null, "Author 1"));
-        Author author2 = authorRepository.save(new Author(null, "Author 2"));
+        mongoTemplate.save(new Author(null, "Author 1"));
+        mongoTemplate.save(new Author(null, "Author 2"));
 
         List<Author> authors = authorService.findAll();
 

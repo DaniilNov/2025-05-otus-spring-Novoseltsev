@@ -11,14 +11,12 @@ import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Comment;
 import ru.otus.hw.models.Genre;
-import ru.otus.hw.repositories.AuthorRepository;
-import ru.otus.hw.repositories.BookRepository;
-import ru.otus.hw.repositories.CommentRepository;
-import ru.otus.hw.repositories.GenreRepository;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @DisplayName("Интеграционные тесты CommentService")
@@ -26,18 +24,6 @@ class CommentServiceImplIntegrationTest {
 
     @Autowired
     private CommentService commentService;
-
-    @Autowired
-    private CommentRepository commentRepository;
-
-    @Autowired
-    private BookRepository bookRepository;
-
-    @Autowired
-    private AuthorRepository authorRepository;
-
-    @Autowired
-    private GenreRepository genreRepository;
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -49,10 +35,10 @@ class CommentServiceImplIntegrationTest {
     void setUp() {
         mongoTemplate.getDb().drop();
 
-        Author author = authorRepository.save(new Author(null, "Test Author"));
-        Genre genre = genreRepository.save(new Genre(null, "Test Genre"));
-        testBook1 = bookRepository.save(new Book(null, "Test Book 1", author, genre));
-        testBook2 = bookRepository.save(new Book(null, "Test Book 2", author, genre));
+        Author author = mongoTemplate.save(new Author(null, "Test Author"));
+        Genre genre = mongoTemplate.save(new Genre(null, "Test Genre"));
+        testBook1 = mongoTemplate.save(new Book(null, "Test Book 1", author, genre));
+        testBook2 = mongoTemplate.save(new Book(null, "Test Book 2", author, genre));
     }
 
     @Test
@@ -61,7 +47,7 @@ class CommentServiceImplIntegrationTest {
         Comment commentToSave = new Comment();
         commentToSave.setText("Test Comment");
         commentToSave.setBook(testBook1);
-        Comment savedComment = commentRepository.save(commentToSave);
+        Comment savedComment = mongoTemplate.save(commentToSave);
 
         Comment foundComment = commentService.findById(savedComment.getId()).orElse(null);
 
@@ -86,17 +72,17 @@ class CommentServiceImplIntegrationTest {
         Comment comment1 = new Comment();
         comment1.setText("Comment 1 for Book1");
         comment1.setBook(testBook1);
-        comment1 = commentRepository.save(comment1);
+        comment1 = mongoTemplate.save(comment1);
 
         Comment comment2 = new Comment();
         comment2.setText("Comment 2 for Book1");
         comment2.setBook(testBook1);
-        comment2 = commentRepository.save(comment2);
+        comment2 = mongoTemplate.save(comment2);
 
         Comment commentForBook2 = new Comment();
         commentForBook2.setText("Comment for Book2");
         commentForBook2.setBook(testBook2);
-        commentRepository.save(commentForBook2);
+        mongoTemplate.save(commentForBook2);
 
         List<Comment> commentsForBook1 = commentService.findByBookId(testBook1.getId());
 
@@ -117,7 +103,7 @@ class CommentServiceImplIntegrationTest {
         assertThat(createdComment.getId()).isNotNull();
         assertThat(createdComment.getText()).isEqualTo("New Comment");
 
-        Comment foundComment = commentRepository.findById(createdComment.getId()).orElse(null);
+        Comment foundComment = mongoTemplate.findById(createdComment.getId(), Comment.class);
         assertThat(foundComment).isNotNull();
         assertThat(foundComment.getText()).isEqualTo("New Comment");
         assertThat(foundComment.getBook().getId()).isEqualTo(testBook1.getId());
@@ -129,14 +115,14 @@ class CommentServiceImplIntegrationTest {
         Comment commentToSave = new Comment();
         commentToSave.setText("Original Text");
         commentToSave.setBook(testBook1);
-        Comment savedComment = commentRepository.save(commentToSave);
+        Comment savedComment = mongoTemplate.save(commentToSave);
 
         Comment updatedComment = commentService.update(savedComment.getId(), "Updated Text");
 
         assertThat(updatedComment.getId()).isEqualTo(savedComment.getId());
         assertThat(updatedComment.getText()).isEqualTo("Updated Text");
 
-        Comment foundComment = commentRepository.findById(savedComment.getId()).orElse(null);
+        Comment foundComment = mongoTemplate.findById(savedComment.getId(), Comment.class);
         assertThat(foundComment).isNotNull();
         assertThat(foundComment.getText()).isEqualTo("Updated Text");
     }
@@ -147,11 +133,11 @@ class CommentServiceImplIntegrationTest {
         Comment commentToSave = new Comment();
         commentToSave.setText("Comment to Delete");
         commentToSave.setBook(testBook1);
-        Comment savedComment = commentRepository.save(commentToSave);
+        Comment savedComment = mongoTemplate.save(commentToSave);
 
         commentService.deleteById(savedComment.getId());
 
-        assertThat(commentRepository.findById(savedComment.getId())).isEmpty();
+        assertThat(mongoTemplate.findById(savedComment.getId(), Comment.class)).isNull();
     }
 
     @Test

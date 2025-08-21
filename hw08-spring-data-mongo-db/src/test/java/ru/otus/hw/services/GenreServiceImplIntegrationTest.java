@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import ru.otus.hw.models.Genre;
-import ru.otus.hw.repositories.GenreRepository;
 
 import java.util.List;
 
@@ -21,22 +20,19 @@ class GenreServiceImplIntegrationTest {
     private GenreService genreService;
 
     @Autowired
-    private GenreRepository genreRepository;
-
-    @Autowired
     private MongoTemplate mongoTemplate;
 
     @BeforeEach
     void setUp() {
         mongoTemplate.getDb().drop();
+
+        mongoTemplate.save(new Genre(null, "Genre 1"));
+        mongoTemplate.save(new Genre(null, "Genre 2"));
     }
 
     @Test
     @DisplayName("должен находить все жанры")
     void shouldFindAllGenres() {
-        Genre genre1 = genreRepository.save(new Genre(null, "Genre 1"));
-        Genre genre2 = genreRepository.save(new Genre(null, "Genre 2"));
-
         List<Genre> genres = genreService.findAll();
 
         assertThat(genres).hasSize(2);
