@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Authors List - Library</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+</head>
+<body>
+<div class="container-fluid">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/}">Library</a>
+            <div class="navbar-nav">
+                <a class="nav-link" th:href="@{/books}">Books</a>
+                <a class="nav-link active" th:href="@{/authors}">Authors</a>
+                <a class="nav-link" th:href="@{/genres}">Genres</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Authors List</h2>
+
+        <div th:if="${authors != null and not #lists.isEmpty(authors)}" class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Full Name</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="author : ${authors}">
+                    <td th:text="${author.id}"></td>
+                    <td th:text="${author.fullName}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:if="${authors == null or #lists.isEmpty(authors)}">
+            <p class="text-muted">No authors found.</p>
+        </div>
+
+        <a th:href="@{/}" class="btn btn-secondary mt-3">Back Home</a>
+    </div>
+</div>
+</body>
+</html>
