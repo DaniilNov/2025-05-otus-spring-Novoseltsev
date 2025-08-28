@@ -1,0 +1,59 @@
+package ru.otus.hw.controllers.rest;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import ru.otus.hw.controllers.rest.dto.CommentCreateDto;
+import ru.otus.hw.controllers.rest.dto.CommentUpdateDto;
+import ru.otus.hw.models.Comment;
+import ru.otus.hw.services.CommentService;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/comments")
+@RequiredArgsConstructor
+public class CommentRestController {
+
+    private final CommentService commentService;
+
+    @GetMapping
+    public ResponseEntity<List<Comment>> getCommentsByBookId(@RequestParam String bookId) {
+        return ResponseEntity.ok(commentService.findByBookId(bookId));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Comment> getCommentById(@PathVariable String id) {
+        return commentService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public ResponseEntity<Comment> createComment(@Valid @RequestBody CommentCreateDto commentDto) {
+        Comment comment = commentService.create(commentDto.getText(), commentDto.getBookId());
+        return ResponseEntity.status(201).body(comment);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Comment> updateComment(@PathVariable String id,
+                                                 @Valid @RequestBody CommentUpdateDto commentDto) {
+        Comment comment = commentService.update(id, commentDto.getText());
+        return ResponseEntity.ok(comment);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteComment(@PathVariable String id) {
+        commentService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+}
