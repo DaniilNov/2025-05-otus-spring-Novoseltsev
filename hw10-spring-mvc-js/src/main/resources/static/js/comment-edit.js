@@ -1,14 +1,17 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const api = new LibraryApi();
-    const commentId = window.location.pathname.split('/').pop();
+    const pathParts = window.location.pathname.split('/');
+    const commentId = pathParts.pop();
+    const bookId = pathParts[pathParts.length - 2];
 
     loadCommentForEdit();
     document.getElementById('editCommentForm').addEventListener('submit', handleUpdateComment);
 
     async function loadCommentForEdit() {
         try {
-            const comment = await api.getCommentById(commentId);
+            const comment = await api.getCommentById(bookId, commentId);
             document.getElementById('commentId').value = comment.id;
+            document.getElementById('bookId').value = comment.book.id;
             document.getElementById('text').value = comment.text;
 
             if (comment.book && comment.book.id) {
@@ -24,9 +27,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const text = document.getElementById('text').value;
         const commentId = document.getElementById('commentId').value;
+        const bookId = document.getElementById('bookId').value;
 
         try {
-            const comment = await api.updateComment(commentId, {
+            const comment = await api.updateComment(bookId, commentId, {
                 text: text
             });
             if (comment.book && comment.book.id) {

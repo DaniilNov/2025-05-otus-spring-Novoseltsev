@@ -51,8 +51,7 @@ class CommentRestControllerTest {
 
         when(commentService.findByBookId("1")).thenReturn(comments);
 
-        mockMvc.perform(get("/api/v1/comments")
-                        .param("bookId", "1"))
+        mockMvc.perform(get("/api/v1/comments/book/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())

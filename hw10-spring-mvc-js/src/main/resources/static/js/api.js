@@ -58,7 +58,7 @@ class LibraryApi {
     }
 
     async getCommentsByBookId(bookId) {
-        return this.fetchJson(`${this.baseUrl}/comments?bookId=${bookId}`);
+        return this.fetchJson(`${this.baseUrl}/comments/book/${bookId}`);
     }
 
     async getCommentById(id) {

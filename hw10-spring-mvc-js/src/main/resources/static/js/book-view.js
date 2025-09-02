@@ -1,11 +1,11 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const api = new LibraryApi();
     const bookId = window.location.pathname.split('/').pop();
 
     loadBookDetails();
     loadComments();
 
-    document.getElementById('addCommentBtn').addEventListener('click', function() {
+    document.getElementById('addCommentBtn').addEventListener('click', function () {
         window.location.href = `/comments/create?bookId=${bookId}`;
     });
 
@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function loadComments() {
         try {
+            const bookId = window.location.pathname.split('/').pop();
             const comments = await api.getCommentsByBookId(bookId);
             renderCommentsTable(comments);
         } catch (error) {
@@ -76,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
         tableContainer.innerHTML = tableHtml;
     }
 
-    window.deleteComment = async function(id) {
+    window.deleteComment = async function (id) {
         if (confirm('Are you sure you want to delete this comment?')) {
             try {
                 await api.deleteComment(id);

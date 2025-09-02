@@ -12,9 +12,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ModelAndView handleEntityNotFound(EntityNotFoundException ex) {
+    public ModelAndView handleEntityNotFound() {
         ModelAndView modelAndView = new ModelAndView("error/404");
-        modelAndView.addObject("errorMessage", ex.getMessage());
+        modelAndView.addObject("errorMessage", "Resource not found");
         return modelAndView;
     }
 }
