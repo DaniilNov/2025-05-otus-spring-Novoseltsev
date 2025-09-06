@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Genres List - Library</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/api.js}"></script>
+    <script th:src="@{/js/genre-list.js}"></script>
+</head>
+<body>
+<div class="container-fluid">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/}">Library</a>
+            <div class="navbar-nav">
+                <a class="nav-link" th:href="@{/books}">Books</a>
+                <a class="nav-link" th:href="@{/authors}">Authors</a>
+                <a class="nav-link active" th:href="@{/genres}">Genres</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Genres List</h2>
+
+        <div id="genresTable" class="table-responsive">
+        </div>
+        <div id="noGenresMessage" class="text-muted" style="display: none;">No genres found.</div>
+
+        <a th:href="@{/}" class="btn btn-secondary mt-3">Back Home</a>
+    </div>
+</div>
+</body>
+</html>
