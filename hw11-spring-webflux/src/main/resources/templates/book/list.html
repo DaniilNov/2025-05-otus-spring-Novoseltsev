@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Books List - Library</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/api.js}"></script>
+    <script th:src="@{/js/book-list.js}"></script>
+</head>
+<body>
+<div class="container-fluid">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/}">Library</a>
+            <div class="navbar-nav">
+                <a class="nav-link active" th:href="@{/books}">Books</a>
+                <a class="nav-link" th:href="@{/authors}">Authors</a>
+                <a class="nav-link" th:href="@{/genres}">Genres</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Books List</h2>
+        <a th:href="@{/books/create}" class="btn btn-primary mb-3">Add New Book</a>
+
+        <div id="booksTable" class="table-responsive">
+        </div>
+        <div id="noBooksMessage" class="text-muted" style="display: none;">No books found.</div>
+    </div>
+</div>
+</body>
+</html>
