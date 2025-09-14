@@ -10,8 +10,8 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Author;
-import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Genre;
+import ru.otus.hw.projections.BookProjection;
 
 @SpringBootTest
 @DisplayName("Интеграционные тесты BookService")
@@ -57,22 +57,22 @@ class BookServiceImplIntegrationTest {
     @Test
     @DisplayName("должен находить все книги")
     void shouldFindAllBooks() {
-        Book book1 = new Book(null, "Book 1", authorId1, genreId1);
-        Book book2 = new Book(null, "Book 2", authorId2, genreId2);
+        BookProjection book1 = new BookProjection(null, "Book 1", authorId1, genreId1);
+        BookProjection book2 = new BookProjection(null, "Book 2", authorId2, genreId2);
 
         reactiveMongoTemplate.save(book1).block();
         reactiveMongoTemplate.save(book2).block();
 
         StepVerifier.create(bookService.findAll())
-                .expectNextMatches(bookDto ->
-                        "Book 1".equals(bookDto.getTitle()) &&
-                                "Test Author 1".equals(bookDto.getAuthor().getFullName()) &&
-                                "Test Genre 1".equals(bookDto.getGenre().getName())
+                .expectNextMatches(book ->
+                        "Book 1".equals(book.getTitle()) &&
+                                "Test Author 1".equals(book.getAuthor().getFullName()) &&
+                                "Test Genre 1".equals(book.getGenre().getName())
                 )
-                .expectNextMatches(bookDto ->
-                        "Book 2".equals(bookDto.getTitle()) &&
-                                "Test Author 2".equals(bookDto.getAuthor().getFullName()) &&
-                                "Test Genre 2".equals(bookDto.getGenre().getName())
+                .expectNextMatches(book ->
+                        "Book 2".equals(book.getTitle()) &&
+                                "Test Author 2".equals(book.getAuthor().getFullName()) &&
+                                "Test Genre 2".equals(book.getGenre().getName())
                 )
                 .verifyComplete();
     }
@@ -80,14 +80,14 @@ class BookServiceImplIntegrationTest {
     @Test
     @DisplayName("должен находить книгу по ID")
     void shouldFindBookById() {
-        Book bookToSave = new Book(null, "Test Book", authorId1, genreId1);
+        BookProjection bookToSave = new BookProjection(null, "Test Book", authorId1, genreId1);
         String bookId = reactiveMongoTemplate.save(bookToSave).block().getId();
 
-        StepVerifier.create(bookService.findDtoById(bookId))
-                .expectNextMatches(bookDto ->
-                        "Test Book".equals(bookDto.getTitle()) &&
-                                "Test Author 1".equals(bookDto.getAuthor().getFullName()) &&
-                                "Test Genre 1".equals(bookDto.getGenre().getName())
+        StepVerifier.create(bookService.findById(bookId))
+                .expectNextMatches(book ->
+                        "Test Book".equals(book.getTitle()) &&
+                                "Test Author 1".equals(book.getAuthor().getFullName()) &&
+                                "Test Genre 1".equals(book.getGenre().getName())
                 )
                 .verifyComplete();
     }
@@ -96,11 +96,11 @@ class BookServiceImplIntegrationTest {
     @DisplayName("должен вставлять новую книгу")
     void shouldInsertNewBook() {
         StepVerifier.create(bookService.insert("New Book", authorId1, genreId1))
-                .expectNextMatches(bookDto ->
-                        "New Book".equals(bookDto.getTitle()) &&
-                                "Test Author 1".equals(bookDto.getAuthor().getFullName()) &&
-                                "Test Genre 1".equals(bookDto.getGenre().getName()) &&
-                                bookDto.getId() != null
+                .expectNextMatches(book ->
+                        "New Book".equals(book.getTitle()) &&
+                                "Test Author 1".equals(book.getAuthor().getFullName()) &&
+                                "Test Genre 1".equals(book.getGenre().getName()) &&
+                                book.getId() != null
                 )
                 .verifyComplete();
     }
@@ -108,14 +108,14 @@ class BookServiceImplIntegrationTest {
     @Test
     @DisplayName("должен обновлять существующую книгу")
     void shouldUpdateExistingBook() {
-        Book bookToSave = new Book(null, "Original Title", authorId1, genreId1);
+        BookProjection bookToSave = new BookProjection(null, "Original Title", authorId1, genreId1);
         String bookId = reactiveMongoTemplate.save(bookToSave).block().getId();
 
         StepVerifier.create(bookService.update(bookId, "Updated Title", authorId2, genreId2))
-                .expectNextMatches(bookDto ->
-                        "Updated Title".equals(bookDto.getTitle()) &&
-                                "Test Author 2".equals(bookDto.getAuthor().getFullName()) &&
-                                "Test Genre 2".equals(bookDto.getGenre().getName())
+                .expectNextMatches(book ->
+                        "Updated Title".equals(book.getTitle()) &&
+                                "Test Author 2".equals(book.getAuthor().getFullName()) &&
+                                "Test Genre 2".equals(book.getGenre().getName())
                 )
                 .verifyComplete();
     }
@@ -123,13 +123,13 @@ class BookServiceImplIntegrationTest {
     @Test
     @DisplayName("должен удалять книгу по ID")
     void shouldDeleteBookById() {
-        Book bookToSave = new Book(null, "Book to Delete", authorId1, genreId1);
+        BookProjection bookToSave = new BookProjection(null, "Book to Delete", authorId1, genreId1);
         String bookId = reactiveMongoTemplate.save(bookToSave).block().getId();
 
         StepVerifier.create(bookService.deleteById(bookId))
                 .verifyComplete();
 
-        StepVerifier.create(reactiveMongoTemplate.findById(bookId, Book.class))
+        StepVerifier.create(reactiveMongoTemplate.findById(bookId, BookProjection.class))
                 .verifyComplete();
     }
 

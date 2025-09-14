@@ -10,9 +10,9 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Author;
-import ru.otus.hw.models.Book;
-import ru.otus.hw.models.Comment;
 import ru.otus.hw.models.Genre;
+import ru.otus.hw.projections.BookProjection;
+import ru.otus.hw.projections.CommentProjection;
 
 @SpringBootTest
 @DisplayName("Интеграционные тесты CommentService")
@@ -46,8 +46,8 @@ class CommentServiceImplIntegrationTest {
         String authorId = author.getId();
         String genreId = genre.getId();
 
-        Book book1 = new Book(null, "Test Book 1", authorId, genreId);
-        Book book2 = new Book(null, "Test Book 2", authorId, genreId);
+        BookProjection book1 = new BookProjection(null, "Test Book 1", authorId, genreId);
+        BookProjection book2 = new BookProjection(null, "Test Book 2", authorId, genreId);
 
         book1 = reactiveMongoTemplate.save(book1).block();
         book2 = reactiveMongoTemplate.save(book2).block();
@@ -59,13 +59,13 @@ class CommentServiceImplIntegrationTest {
     @Test
     @DisplayName("должен находить комментарий по ID")
     void shouldFindCommentById() {
-        Comment commentToSave = new Comment(null, "Test Comment", bookId1);
+        CommentProjection commentToSave = new CommentProjection(null, "Test Comment", bookId1);
         String commentId = reactiveMongoTemplate.save(commentToSave).block().getId();
 
-        StepVerifier.create(commentService.findDtoById(commentId))
-                .expectNextMatches(commentDto ->
-                        "Test Comment".equals(commentDto.getText()) &&
-                                "Test Book 1".equals(commentDto.getBook().getTitle())
+        StepVerifier.create(commentService.findById(commentId))
+                .expectNextMatches(comment ->
+                        "Test Comment".equals(comment.getText()) &&
+                                "Test Book 1".equals(comment.getBook().getTitle())
                 )
                 .verifyComplete();
     }
@@ -73,15 +73,15 @@ class CommentServiceImplIntegrationTest {
     @Test
     @DisplayName("должен находить комментарии по ID книги")
     void shouldFindCommentsByBookId() {
-        Comment comment1 = new Comment(null, "Comment 1 for Book1", bookId1);
-        Comment comment2 = new Comment(null, "Comment 2 for Book1", bookId1);
-        Comment comment3 = new Comment(null, "Comment for Book2", bookId2);
+        CommentProjection comment1 = new CommentProjection(null, "Comment 1 for Book1", bookId1);
+        CommentProjection comment2 = new CommentProjection(null, "Comment 2 for Book1", bookId1);
+        CommentProjection comment3 = new CommentProjection(null, "Comment for Book2", bookId2);
 
         reactiveMongoTemplate.save(comment1).block();
         reactiveMongoTemplate.save(comment2).block();
         reactiveMongoTemplate.save(comment3).block();
 
-        StepVerifier.create(commentService.findDtosByBookId(bookId1))
+        StepVerifier.create(commentService.findByBookId(bookId1))
                 .expectNextCount(2)
                 .verifyComplete();
     }
@@ -92,7 +92,7 @@ class CommentServiceImplIntegrationTest {
         StepVerifier.create(commentService.create("New Comment", bookId1))
                 .expectNextMatches(comment ->
                         "New Comment".equals(comment.getText()) &&
-                                bookId1.equals(comment.getBookId()) &&
+                                bookId1.equals(comment.getBook().getId()) &&
                                 comment.getId() != null
                 )
                 .verifyComplete();
@@ -101,7 +101,7 @@ class CommentServiceImplIntegrationTest {
     @Test
     @DisplayName("должен обновлять существующий комментарий")
     void shouldUpdateExistingComment() {
-        Comment commentToSave = new Comment(null, "Original Text", bookId1);
+        CommentProjection commentToSave = new CommentProjection(null, "Original Text", bookId1);
         String commentId = reactiveMongoTemplate.save(commentToSave).block().getId();
 
         StepVerifier.create(commentService.update(commentId, "Updated Text"))
@@ -115,13 +115,13 @@ class CommentServiceImplIntegrationTest {
     @Test
     @DisplayName("должен удалять комментарий по ID")
     void shouldDeleteCommentById() {
-        Comment commentToSave = new Comment(null, "Comment to Delete", bookId1);
+        CommentProjection commentToSave = new CommentProjection(null, "Comment to Delete", bookId1);
         String commentId = reactiveMongoTemplate.save(commentToSave).block().getId();
 
         StepVerifier.create(commentService.deleteById(commentId))
                 .verifyComplete();
 
-        StepVerifier.create(reactiveMongoTemplate.findById(commentId, Comment.class))
+        StepVerifier.create(reactiveMongoTemplate.findById(commentId, CommentProjection.class))
                 .verifyComplete();
     }
 

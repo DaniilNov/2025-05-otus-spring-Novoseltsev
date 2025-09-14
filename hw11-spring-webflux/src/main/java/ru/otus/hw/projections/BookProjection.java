@@ -1,4 +1,4 @@
-package ru.otus.hw.models;
+package ru.otus.hw.projections;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -14,14 +14,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Book {
+public class BookProjection {
     @Id
     @EqualsAndHashCode.Include
     private String id;
 
     private String title;
 
-    private Author author;
+    private String authorId;
 
-    private Genre genre;
+    private String genreId;
 }

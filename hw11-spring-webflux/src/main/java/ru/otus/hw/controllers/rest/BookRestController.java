@@ -15,7 +15,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.otus.hw.controllers.rest.dto.BookCreateDto;
 import ru.otus.hw.controllers.rest.dto.BookUpdateDto;
-import ru.otus.hw.dto.BookDto;
+import ru.otus.hw.models.Book;
 import ru.otus.hw.services.BookService;
 
 @RestController
@@ -25,26 +25,27 @@ public class BookRestController {
     private final BookService bookService;
 
     @GetMapping("/api/v1/books")
-    public Flux<BookDto> getAllBooks() {
+    public Flux<Book> getAllBooks() {
         return bookService.findAll();
     }
 
     @GetMapping("/api/v1/books/{id}")
-    public Mono<ResponseEntity<BookDto>> getBookById(@PathVariable String id) {
-        return bookService.findDtoById(id)
+    public Mono<ResponseEntity<Book>> getBookById(@PathVariable String id) {
+        return bookService.findById(id)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @PostMapping("/api/v1/books")
-    public Mono<ResponseEntity<BookDto>> createBook(@Valid @RequestBody BookCreateDto bookDto) {
+    public Mono<ResponseEntity<Book>> createBook(@Valid @RequestBody BookCreateDto bookDto) {
         return bookService.insert(bookDto.getTitle(), bookDto.getAuthorId(), bookDto.getGenreId())
                 .map(book -> ResponseEntity.status(HttpStatus.CREATED).body(book))
                 .onErrorReturn(ResponseEntity.badRequest().build());
     }
 
     @PutMapping("/api/v1/books/{id}")
-    public Mono<ResponseEntity<BookDto>> updateBook(@PathVariable String id, @Valid @RequestBody BookUpdateDto bookDto) {
+    public Mono<ResponseEntity<Book>> updateBook(@PathVariable String id,
+                                                 @Valid @RequestBody BookUpdateDto bookDto) {
         return bookService.update(id, bookDto.getTitle(), bookDto.getAuthorId(), bookDto.getGenreId())
                 .map(ResponseEntity::ok)
                 .onErrorReturn(ResponseEntity.badRequest().build());

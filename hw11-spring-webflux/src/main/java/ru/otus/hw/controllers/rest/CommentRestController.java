@@ -15,7 +15,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.otus.hw.controllers.rest.dto.CommentCreateDto;
 import ru.otus.hw.controllers.rest.dto.CommentUpdateDto;
-import ru.otus.hw.dto.CommentDto;
+import ru.otus.hw.models.Comment;
 import ru.otus.hw.services.CommentService;
 
 @RestController
@@ -25,30 +25,28 @@ public class CommentRestController {
     private final CommentService commentService;
 
     @GetMapping("/api/v1/comments/book/{bookId}")
-    public Flux<CommentDto> getCommentsByBookId(@PathVariable String bookId) {
-        return commentService.findDtosByBookId(bookId);
+    public Flux<Comment> getCommentsByBookId(@PathVariable String bookId) {
+        return commentService.findByBookId(bookId);
     }
 
     @GetMapping("/api/v1/comments/{id}")
-    public Mono<ResponseEntity<CommentDto>> getCommentById(@PathVariable String id) {
-        return commentService.findDtoById(id)
+    public Mono<ResponseEntity<Comment>> getCommentById(@PathVariable String id) {
+        return commentService.findById(id)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @PostMapping("/api/v1/comments")
-    public Mono<ResponseEntity<CommentDto>> createComment(@Valid @RequestBody CommentCreateDto commentDto) {
+    public Mono<ResponseEntity<Comment>> createComment(@Valid @RequestBody CommentCreateDto commentDto) {
         return commentService.create(commentDto.getText(), commentDto.getBookId())
-                .flatMap(comment -> commentService.findDtoById(comment.getId()))
                 .map(comment -> ResponseEntity.status(HttpStatus.CREATED).body(comment))
                 .onErrorReturn(ResponseEntity.badRequest().build());
     }
 
     @PutMapping("/api/v1/comments/{id}")
-    public Mono<ResponseEntity<CommentDto>> updateComment(@PathVariable String id,
-                                                          @Valid @RequestBody CommentUpdateDto commentDto) {
+    public Mono<ResponseEntity<Comment>> updateComment(@PathVariable String id,
+                                                       @Valid @RequestBody CommentUpdateDto commentDto) {
         return commentService.update(id, commentDto.getText())
-                .flatMap(comment -> commentService.findDtoById(comment.getId()))
                 .map(ResponseEntity::ok)
                 .onErrorReturn(ResponseEntity.badRequest().build());
     }

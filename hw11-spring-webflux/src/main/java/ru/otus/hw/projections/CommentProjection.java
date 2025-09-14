@@ -1,4 +1,4 @@
-package ru.otus.hw.models;
+package ru.otus.hw.projections;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -8,20 +8,18 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "books")
+@Document(collection = "comments")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Book {
+public class CommentProjection {
     @Id
     @EqualsAndHashCode.Include
     private String id;
 
-    private String title;
+    private String text;
 
-    private Author author;
-
-    private Genre genre;
+    private String bookId;
 }

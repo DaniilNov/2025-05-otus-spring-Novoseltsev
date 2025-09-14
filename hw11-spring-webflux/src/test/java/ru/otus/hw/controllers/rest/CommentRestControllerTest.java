@@ -11,9 +11,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.otus.hw.controllers.rest.dto.CommentCreateDto;
 import ru.otus.hw.controllers.rest.dto.CommentUpdateDto;
-import ru.otus.hw.dto.CommentDto;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
+import ru.otus.hw.models.Comment;
 import ru.otus.hw.models.Genre;
 import ru.otus.hw.services.CommentService;
 
@@ -40,98 +40,94 @@ class CommentRestControllerTest {
     void getCommentsByBookIdShouldReturnCommentsList() {
         Author author = new Author("1", "Author Name");
         Genre genre = new Genre("1", "Genre Name");
-        Book book = new Book("1", "Book Title", "1", "1");
-        CommentDto commentDto1 = new CommentDto("1", "Comment 1", book);
-        CommentDto commentDto2 = new CommentDto("2", "Comment 2", book);
-        List<CommentDto> commentDtos = List.of(commentDto1, commentDto2);
+        Book book = new Book("1", "Book Title", author, genre);
+        Comment comment1 = new Comment("1", "Comment 1", book);
+        Comment comment2 = new Comment("2", "Comment 2", book);
+        List<Comment> comments = List.of(comment1, comment2);
 
-        when(commentService.findDtosByBookId("1")).thenReturn(Flux.fromIterable(commentDtos));
+        when(commentService.findByBookId("1")).thenReturn(Flux.fromIterable(comments));
 
         webTestClient.get().uri("/api/v1/comments/book/1")
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType("application/json")
-                .expectBodyList(CommentDto.class)
+                .expectBodyList(Comment.class)
                 .hasSize(2)
-                .contains(commentDto1, commentDto2);
+                .contains(comment1, comment2);
 
-        verify(commentService, times(1)).findDtosByBookId("1");
+        verify(commentService, times(1)).findByBookId("1");
     }
 
     @Test
     void getCommentByIdExistingCommentShouldReturnComment() {
         Author author = new Author("1", "Author Name");
         Genre genre = new Genre("1", "Genre Name");
-        Book book = new Book("1", "Book Title", "1", "1");
-        CommentDto commentDto = new CommentDto("1", "Comment Text", book);
+        Book book = new Book("1", "Book Title", author, genre);
+        Comment comment = new Comment("1", "Comment Text", book);
 
-        when(commentService.findDtoById("1")).thenReturn(Mono.just(commentDto));
+        when(commentService.findById("1")).thenReturn(Mono.just(comment));
 
         webTestClient.get().uri("/api/v1/comments/1")
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType("application/json")
-                .expectBody(CommentDto.class)
-                .isEqualTo(commentDto);
+                .expectBody(Comment.class)
+                .isEqualTo(comment);
 
-        verify(commentService, times(1)).findDtoById("1");
+        verify(commentService, times(1)).findById("1");
     }
 
     @Test
-    void getCommentByIdNonExistingCommentShouldReturnNotFound(){
-        when(commentService.findDtoById("999")).thenReturn(Mono.empty());
+    void getCommentByIdNonExistingCommentShouldReturnNotFound() {
+        when(commentService.findById("999")).thenReturn(Mono.empty());
 
         webTestClient.get().uri("/api/v1/comments/999")
                 .exchange()
                 .expectStatus().isNotFound();
 
-        verify(commentService, times(1)).findDtoById("999");
+        verify(commentService, times(1)).findById("999");
     }
 
     @Test
     void createCommentValidDataShouldReturnCreatedComment() throws Exception {
         Author author = new Author("1", "Author Name");
         Genre genre = new Genre("1", "Genre Name");
-        Book book = new Book("1", "Book Title", "1", "1");
-        CommentDto commentDto = new CommentDto("1", "New Comment", book);
+        Book book = new Book("1", "Book Title", author, genre);
+        Comment comment = new Comment("1", "New Comment", book);
         CommentCreateDto commentCreateDto = new CommentCreateDto("New Comment", "1");
 
-        when(commentService.create(eq("New Comment"), eq("1"))).thenReturn(Mono.just(new ru.otus.hw.models.Comment("1", "New Comment", "1")));
-        when(commentService.findDtoById("1")).thenReturn(Mono.just(commentDto));
+        when(commentService.create(eq("New Comment"), eq("1"))).thenReturn(Mono.just(comment));
 
         webTestClient.post().uri("/api/v1/comments")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString(commentCreateDto))
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(CommentDto.class)
-                .isEqualTo(commentDto);
+                .expectBody(Comment.class)
+                .isEqualTo(comment);
 
         verify(commentService, times(1)).create("New Comment", "1");
-        verify(commentService, times(1)).findDtoById("1");
     }
 
     @Test
     void updateCommentValidDataShouldReturnUpdatedComment() throws Exception {
         Author author = new Author("1", "Author Name");
         Genre genre = new Genre("1", "Genre Name");
-        Book book = new Book("1", "Book Title", "1", "1");
-        CommentDto commentDto = new CommentDto("1", "Updated Comment", book);
+        Book book = new Book("1", "Book Title", author, genre);
+        Comment comment = new Comment("1", "Updated Comment", book);
         CommentUpdateDto commentUpdateDto = new CommentUpdateDto("Updated Comment");
 
-        when(commentService.update(eq("1"), eq("Updated Comment"))).thenReturn(Mono.just(new ru.otus.hw.models.Comment("1", "Updated Comment", "1")));
-        when(commentService.findDtoById("1")).thenReturn(Mono.just(commentDto));
+        when(commentService.update(eq("1"), eq("Updated Comment"))).thenReturn(Mono.just(comment));
 
         webTestClient.put().uri("/api/v1/comments/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString(commentUpdateDto))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(CommentDto.class)
-                .isEqualTo(commentDto);
+                .expectBody(Comment.class)
+                .isEqualTo(comment);
 
         verify(commentService, times(1)).update("1", "Updated Comment");
-        verify(commentService, times(1)).findDtoById("1");
     }
 
     @Test
