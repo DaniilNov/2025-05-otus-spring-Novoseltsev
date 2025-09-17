@@ -24,7 +24,7 @@ class AuthorServiceImplIntegrationTest {
     void setUp() {
         reactiveMongoTemplate.getCollection("authors")
                 .flatMap(collection -> Mono.from(collection.drop()))
-                .subscribe();
+                .block();
     }
 
     @Test

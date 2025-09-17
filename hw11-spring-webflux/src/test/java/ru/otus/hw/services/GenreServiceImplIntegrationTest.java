@@ -24,7 +24,7 @@ class GenreServiceImplIntegrationTest {
     void setUp() {
         reactiveMongoTemplate.getCollection("genres")
                 .flatMap(collection -> Mono.from(collection.drop()))
-                .subscribe();
+                .block();
     }
 
     @Test

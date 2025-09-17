@@ -39,7 +39,6 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         log.info("Starting data initialization...");
-
         reactiveMongoTemplate.getCollection("authors")
                 .flatMap(collection ->
                         Mono.from(collection.estimatedDocumentCount())
@@ -48,16 +47,20 @@ public class DataInitializer implements CommandLineRunner {
                 .doOnNext(count -> {
                     if (count == 0) {
                         log.info("Initializing sample data...");
-                        initializeData().subscribe();
-                        log.info("Sample data successfully loaded.");
+                        initializeData()
+                                .subscribe(
+                                        unused -> log.info("Sample data successfully loaded."),
+                                        error -> log.error("Error loading sample data", error)
+                                );
                     } else {
                         log.info("Data already exists, skipping initialization.");
                     }
                 })
                 .doOnError(ex -> log.error("Error during data initialization", ex))
-                .subscribe();
-
-        log.info("Data initialization finished.");
+                .subscribe(
+                        unused -> log.info("Data initialization finished."),
+                        error -> log.error("Failed to initialize data", error)
+                );
     }
 
     private Mono<Void> initializeData() {
