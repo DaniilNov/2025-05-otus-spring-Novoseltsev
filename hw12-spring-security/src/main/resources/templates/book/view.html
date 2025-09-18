@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>View Book - Library</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/api.js}"></script>
+    <script th:src="@{/js/book-view.js}"></script>
+</head>
+<body>
+<div class="container-fluid">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/}">Library</a>
+            <div class="navbar-nav">
+                <a class="nav-link active" th:href="@{/books}">Books</a>
+                <a class="nav-link" th:href="@{/authors}">Authors</a>
+                <a class="nav-link" th:href="@{/genres}">Genres</a>
+            </div>
+            <div class="navbar-nav ms-auto">
+                <form th:action="@{/perform_logout}" method="post" class="d-flex align-items-center">
+                    <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Book Details</h2>
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title" id="bookTitle"></h5>
+                <p class="card-text"><strong>Author:</strong> <span id="bookAuthor"></span></p>
+                <p class="card-text"><strong>Genre:</strong> <span id="bookGenre"></span></p>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                Comments
+                <button id="addCommentBtn" class="btn btn-primary btn-sm float-end">Add Comment</button>
+            </div>
+            <div class="card-body">
+                <div id="commentsTable" class="table-responsive">
+                </div>
+                <div id="noCommentsMessage" class="text-muted" style="display: none;">No comments yet.</div>
+            </div>
+        </div>
+
+        <a th:href="@{/books}" class="btn btn-secondary">Back to Books</a>
+        <a id="editBookLink" class="btn btn-warning">Edit Book</a>
+    </div>
+</div>
+</body>
+</html>

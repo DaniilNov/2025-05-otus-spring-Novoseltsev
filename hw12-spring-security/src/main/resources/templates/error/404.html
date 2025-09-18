@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Page Not Found - Library</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <style>
+        body {
+            padding-top: 20px;
+        }
+        .error-container {
+            text-align: center;
+            margin-top: 50px;
+        }
+        .error-code {
+            font-size: 5rem;
+            font-weight: bold;
+            color: #dc3545;
+        }
+        .error-message {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/}">Library</a>
+            <div class="navbar-nav">
+                <a class="nav-link" th:href="@{/books}">Books</a>
+                <a class="nav-link" th:href="@{/authors}">Authors</a>
+                <a class="nav-link" th:href="@{/genres}">Genres</a>
+            </div>
+            <div class="navbar-nav ms-auto">
+                <form th:action="@{/perform_logout}" method="post" class="d-flex align-items-center">
+                    <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="error-container">
+            <div class="error-code">404</div>
+            <div class="error-message" th:text="${errorMessage} ?: 'The requested page could not be found.'">
+                The requested page could not be found.
+            </div>
+            <a th:href="@{/}" class="btn btn-primary">Go Home</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
