@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Comment - Library</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/api.js}"></script>
+    <script th:src="@{/js/comment-edit.js}"></script>
+</head>
+<body>
+<div class="container-fluid">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/}">Library</a>
+            <div class="navbar-nav">
+                <a class="nav-link active" th:href="@{/books}">Books</a>
+                <a class="nav-link" th:href="@{/authors}">Authors</a>
+                <a class="nav-link" th:href="@{/genres}">Genres</a>
+            </div>
+            <div class="navbar-nav ms-auto">
+                <form th:action="@{/perform_logout}" method="post" class="d-flex align-items-center">
+                    <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Edit Comment</h2>
+        <form id="editCommentForm">
+            <input type="hidden" id="commentId" name="commentId">
+            <!-- Скрытое поле bookId для редиректа после сохранения -->
+            <input type="hidden" id="bookId" name="bookId">
+            <div class="mb-3">
+                <label for="text" class="form-label">Comment Text:</label>
+                <textarea class="form-control" id="text" name="text" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Comment</button>
+            <a id="cancelLink" class="btn btn-secondary" href="/books">Cancel</a> <!-- Дефолтный href -->
+        </form>
+    </div>
+</div>
+</body>
+</html>
