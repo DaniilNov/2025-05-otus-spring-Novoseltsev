@@ -8,19 +8,22 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.otus.hw.config.TestSecurityConfig;
+import ru.otus.hw.config.SecurityConfiguration;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.services.AuthorService;
 
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AuthorRestController.class)
-@Import(TestSecurityConfig.class)
-@WithMockUser
+@Import(SecurityConfiguration.class)
 class AuthorRestControllerTest {
 
     @Autowired
@@ -30,6 +33,7 @@ class AuthorRestControllerTest {
     private AuthorService authorService;
 
     @Test
+    @WithMockUser
     void getAllAuthorsShouldReturnAuthorsList() throws Exception {
         Author author1 = new Author("1", "Author 1");
         Author author2 = new Author("2", "Author 2");

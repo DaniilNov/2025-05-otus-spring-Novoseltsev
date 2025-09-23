@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.otus.hw.config.TestSecurityConfig;
+import ru.otus.hw.config.SecurityConfiguration;
 import ru.otus.hw.controllers.rest.dto.BookCreateDto;
 import ru.otus.hw.controllers.rest.dto.BookUpdateDto;
 import ru.otus.hw.models.Author;
@@ -34,8 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BookRestController.class)
-@Import(TestSecurityConfig.class)
-@WithMockUser
+@Import(SecurityConfiguration.class)
 class BookRestControllerTest {
 
     @Autowired
@@ -48,6 +47,7 @@ class BookRestControllerTest {
     private BookService bookService;
 
     @Test
+    @WithMockUser
     void getAllBooksShouldReturnBooksList() throws Exception {
         Author author = new Author("1", "Author Name");
         Genre genre = new Genre("1", "Genre Name");
@@ -69,6 +69,7 @@ class BookRestControllerTest {
     }
 
     @Test
+    @WithMockUser
     void getBookByIdExistingBookShouldReturnBook() throws Exception {
         Author author = new Author("1", "Author Name");
         Genre genre = new Genre("1", "Genre Name");
@@ -86,6 +87,7 @@ class BookRestControllerTest {
     }
 
     @Test
+    @WithMockUser
     void getBookByIdNonExistingBookShouldReturnNotFound() throws Exception {
         when(bookService.findById("999")).thenReturn(Optional.empty());
 
@@ -96,6 +98,7 @@ class BookRestControllerTest {
     }
 
     @Test
+    @WithMockUser
     void createBookValidDataShouldReturnCreatedBook() throws Exception {
         Author author = new Author("1", "Author Name");
         Genre genre = new Genre("1", "Genre Name");
@@ -115,6 +118,7 @@ class BookRestControllerTest {
     }
 
     @Test
+    @WithMockUser
     void createBookInvalidDataShouldReturnBadRequest() throws Exception {
         BookCreateDto bookCreateDto = new BookCreateDto("", "1", "1");
 
@@ -125,6 +129,7 @@ class BookRestControllerTest {
     }
 
     @Test
+    @WithMockUser
     void updateBookValidDataShouldReturnUpdatedBook() throws Exception {
         Author author = new Author("1", "Author Name");
         Genre genre = new Genre("1", "Genre Name");
@@ -144,6 +149,7 @@ class BookRestControllerTest {
     }
 
     @Test
+    @WithMockUser
     void deleteBookShouldReturnNoContent() throws Exception {
         doNothing().when(bookService).deleteById("1");
 

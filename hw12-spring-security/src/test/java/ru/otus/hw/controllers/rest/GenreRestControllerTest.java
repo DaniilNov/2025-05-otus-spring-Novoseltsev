@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.otus.hw.config.TestSecurityConfig;
+import ru.otus.hw.config.SecurityConfiguration;
 import ru.otus.hw.models.Genre;
 import ru.otus.hw.services.GenreService;
 
@@ -23,8 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(GenreRestController.class)
-@Import(TestSecurityConfig.class)
-@WithMockUser
+@Import(SecurityConfiguration.class)
 class GenreRestControllerTest {
 
     @Autowired
@@ -34,6 +33,7 @@ class GenreRestControllerTest {
     private GenreService genreService;
 
     @Test
+    @WithMockUser
     void getAllGenresShouldReturnGenresList() throws Exception {
         Genre genre1 = new Genre("1", "Genre 1");
         Genre genre2 = new Genre("2", "Genre 2");

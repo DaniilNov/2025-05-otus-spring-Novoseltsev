@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.otus.hw.config.TestSecurityConfig;
+import ru.otus.hw.config.SecurityConfiguration;
 import ru.otus.hw.controllers.rest.dto.CommentCreateDto;
 import ru.otus.hw.controllers.rest.dto.CommentUpdateDto;
 import ru.otus.hw.models.Book;
@@ -33,8 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CommentRestController.class)
-@Import(TestSecurityConfig.class)
-@WithMockUser
+@Import(SecurityConfiguration.class)
 class CommentRestControllerTest {
 
     @Autowired
@@ -47,6 +46,7 @@ class CommentRestControllerTest {
     private CommentService commentService;
 
     @Test
+    @WithMockUser
     void getCommentsByBookIdShouldReturnCommentsList() throws Exception {
         Book book = new Book();
         book.setId("1");
@@ -70,6 +70,7 @@ class CommentRestControllerTest {
     }
 
     @Test
+    @WithMockUser
     void getCommentByIdExistingCommentShouldReturnComment() throws Exception {
         Book book = new Book();
         book.setId("1");
@@ -88,6 +89,7 @@ class CommentRestControllerTest {
     }
 
     @Test
+    @WithMockUser
     void getCommentByIdNonExistingCommentShouldReturnNotFound() throws Exception {
         when(commentService.findById("999")).thenReturn(Optional.empty());
 
@@ -98,6 +100,7 @@ class CommentRestControllerTest {
     }
 
     @Test
+    @WithMockUser
     void createCommentValidDataShouldReturnCreatedComment() throws Exception {
         Book book = new Book();
         book.setId("1");
@@ -117,6 +120,7 @@ class CommentRestControllerTest {
     }
 
     @Test
+    @WithMockUser
     void updateCommentValidDataShouldReturnUpdatedComment() throws Exception {
         Book book = new Book();
         book.setId("1");
@@ -136,6 +140,7 @@ class CommentRestControllerTest {
     }
 
     @Test
+    @WithMockUser
     void deleteCommentShouldReturnNoContent() throws Exception {
         doNothing().when(commentService).deleteById("1");
 
@@ -146,6 +151,7 @@ class CommentRestControllerTest {
     }
 
     @Test
+    @WithMockUser
     void createCommentInvalidDataShouldReturnBadRequest() throws Exception {
         CommentCreateDto commentCreateDto = new CommentCreateDto("", "1");
 
@@ -156,6 +162,7 @@ class CommentRestControllerTest {
     }
 
     @Test
+    @WithMockUser
     void updateCommentInvalidDataShouldReturnBadRequest() throws Exception {
         CommentUpdateDto commentUpdateDto = new CommentUpdateDto("");
 
