@@ -2,13 +2,11 @@ package ru.otus.hw.controllers.rest;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.otus.hw.config.SecurityConfiguration;
 import ru.otus.hw.models.Genre;
 import ru.otus.hw.services.GenreService;
 
@@ -22,8 +20,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(GenreRestController.class)
-@Import(SecurityConfiguration.class)
+@WebMvcTest(value = GenreRestController.class,
+        excludeAutoConfiguration = SecurityAutoConfiguration.class)
 class GenreRestControllerTest {
 
     @Autowired
@@ -33,7 +31,6 @@ class GenreRestControllerTest {
     private GenreService genreService;
 
     @Test
-    @WithMockUser
     void getAllGenresShouldReturnGenresList() throws Exception {
         Genre genre1 = new Genre("1", "Genre 1");
         Genre genre2 = new Genre("2", "Genre 2");

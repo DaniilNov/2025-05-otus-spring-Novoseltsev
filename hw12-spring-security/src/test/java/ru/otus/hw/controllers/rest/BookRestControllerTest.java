@@ -3,13 +3,11 @@ package ru.otus.hw.controllers.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.otus.hw.config.SecurityConfiguration;
 import ru.otus.hw.controllers.rest.dto.BookCreateDto;
 import ru.otus.hw.controllers.rest.dto.BookUpdateDto;
 import ru.otus.hw.models.Author;
@@ -33,8 +31,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(BookRestController.class)
-@Import(SecurityConfiguration.class)
+@WebMvcTest(value = BookRestController.class,
+        excludeAutoConfiguration = SecurityAutoConfiguration.class)
 class BookRestControllerTest {
 
     @Autowired
@@ -47,7 +45,6 @@ class BookRestControllerTest {
     private BookService bookService;
 
     @Test
-    @WithMockUser
     void getAllBooksShouldReturnBooksList() throws Exception {
         Author author = new Author("1", "Author Name");
         Genre genre = new Genre("1", "Genre Name");
@@ -69,7 +66,6 @@ class BookRestControllerTest {
     }
 
     @Test
-    @WithMockUser
     void getBookByIdExistingBookShouldReturnBook() throws Exception {
         Author author = new Author("1", "Author Name");
         Genre genre = new Genre("1", "Genre Name");
@@ -87,7 +83,6 @@ class BookRestControllerTest {
     }
 
     @Test
-    @WithMockUser
     void getBookByIdNonExistingBookShouldReturnNotFound() throws Exception {
         when(bookService.findById("999")).thenReturn(Optional.empty());
 
@@ -98,7 +93,6 @@ class BookRestControllerTest {
     }
 
     @Test
-    @WithMockUser
     void createBookValidDataShouldReturnCreatedBook() throws Exception {
         Author author = new Author("1", "Author Name");
         Genre genre = new Genre("1", "Genre Name");
@@ -118,7 +112,6 @@ class BookRestControllerTest {
     }
 
     @Test
-    @WithMockUser
     void createBookInvalidDataShouldReturnBadRequest() throws Exception {
         BookCreateDto bookCreateDto = new BookCreateDto("", "1", "1");
 
@@ -129,7 +122,6 @@ class BookRestControllerTest {
     }
 
     @Test
-    @WithMockUser
     void updateBookValidDataShouldReturnUpdatedBook() throws Exception {
         Author author = new Author("1", "Author Name");
         Genre genre = new Genre("1", "Genre Name");
@@ -149,7 +141,6 @@ class BookRestControllerTest {
     }
 
     @Test
-    @WithMockUser
     void deleteBookShouldReturnNoContent() throws Exception {
         doNothing().when(bookService).deleteById("1");
 

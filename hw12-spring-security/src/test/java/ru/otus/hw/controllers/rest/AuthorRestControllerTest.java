@@ -2,13 +2,11 @@ package ru.otus.hw.controllers.rest;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.otus.hw.config.SecurityConfiguration;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.services.AuthorService;
 
@@ -22,8 +20,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(AuthorRestController.class)
-@Import(SecurityConfiguration.class)
+@WebMvcTest(value = AuthorRestController.class,
+        excludeAutoConfiguration = SecurityAutoConfiguration.class)
 class AuthorRestControllerTest {
 
     @Autowired
@@ -33,7 +31,6 @@ class AuthorRestControllerTest {
     private AuthorService authorService;
 
     @Test
-    @WithMockUser
     void getAllAuthorsShouldReturnAuthorsList() throws Exception {
         Author author1 = new Author("1", "Author 1");
         Author author2 = new Author("2", "Author 2");
