@@ -1,0 +1,11 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  data:
+    mongodb:
+      uri: mongodb://localhost/testdb
+logging:
+  level:
+    org.springframework.data.mongodb: WARN
+    org.springframework.transaction: WARN
+    de.flapdoodle.embed.mongo: DEBUG
