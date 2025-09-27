@@ -70,30 +70,30 @@ class SecurityWebControllerTest {
     public static Stream<Arguments> getTestData() {
         var roles = new String[]{"USER"};
         return Stream.of(
-                Arguments.of("get", "/api/v1/authors", null, null, 302, true),
-                Arguments.of("get", "/api/v1/authors", "user", roles, 200, false),
-                Arguments.of("get", "/api/v1/books", null, null, 302, true),
-                Arguments.of("get", "/api/v1/books", "user", roles, 200, false),
-                Arguments.of("get", "/api/v1/books/1", null, null, 302, true),
-                Arguments.of("get", "/api/v1/books/1", "user", roles, 404, false),
-                Arguments.of("post", "/api/v1/books", null, null, 302, true),
-                Arguments.of("post", "/api/v1/books", "user", roles, 400, false),
-                Arguments.of("put", "/api/v1/books/1", null, null, 302, true),
-                Arguments.of("put", "/api/v1/books/1", "user", roles, 400, false),
-                Arguments.of("delete", "/api/v1/books/1", null, null, 302, true),
-                Arguments.of("delete", "/api/v1/books/1", "user", roles, 204, false),
-                Arguments.of("get", "/api/v1/genres", null, null, 302, true),
-                Arguments.of("get", "/api/v1/genres", "user", roles, 200, false),
-                Arguments.of("get", "/api/v1/comments/book/1", null, null, 302, true),
-                Arguments.of("get", "/api/v1/comments/book/1", "user", roles, 200, false),
-                Arguments.of("get", "/api/v1/comments/1", null, null, 302, true),
-                Arguments.of("get", "/api/v1/comments/1", "user", roles, 404, false),
-                Arguments.of("post", "/api/v1/comments", null, null, 302, true),
-                Arguments.of("post", "/api/v1/comments", "user", roles, 400, false),
-                Arguments.of("put", "/api/v1/comments/1", null, null, 302, true),
-                Arguments.of("put", "/api/v1/comments/1", "user", roles, 400, false),
-                Arguments.of("delete", "/api/v1/comments/1", null, null, 302, true),
-                Arguments.of("delete", "/api/v1/comments/1", "user", roles, 204, false)
+                Arguments.of("get", "/api/v1/authors", null, null, 302, true, false, null),
+                Arguments.of("get", "/api/v1/authors", "user", roles, 200, false, false, null),
+                Arguments.of("get", "/api/v1/books", null, null, 302, true, false, null),
+                Arguments.of("get", "/api/v1/books", "user", roles, 200, false, false, null),
+                Arguments.of("get", "/api/v1/books/1", null, null, 302, true, false, null),
+                Arguments.of("get", "/api/v1/books/1", "user", roles, 404, false, false, null),
+                Arguments.of("post", "/api/v1/books", null, null, 302, true, true, MediaType.APPLICATION_JSON),
+                Arguments.of("post", "/api/v1/books", "user", roles, 400, false, true, MediaType.APPLICATION_JSON),
+                Arguments.of("put", "/api/v1/books/1", null, null, 302, true, true, MediaType.APPLICATION_JSON),
+                Arguments.of("put", "/api/v1/books/1", "user", roles, 400, false, true, MediaType.APPLICATION_JSON),
+                Arguments.of("delete", "/api/v1/books/1", null, null, 302, true, true, null),
+                Arguments.of("delete", "/api/v1/books/1", "user", roles, 204, false, true, null),
+                Arguments.of("get", "/api/v1/genres", null, null, 302, true, false, null),
+                Arguments.of("get", "/api/v1/genres", "user", roles, 200, false, false, null),
+                Arguments.of("get", "/api/v1/comments/book/1", null, null, 302, true, false, null),
+                Arguments.of("get", "/api/v1/comments/book/1", "user", roles, 200, false, false, null),
+                Arguments.of("get", "/api/v1/comments/1", null, null, 302, true, false, null),
+                Arguments.of("get", "/api/v1/comments/1", "user", roles, 404, false, false, null),
+                Arguments.of("post", "/api/v1/comments", null, null, 302, true, true, MediaType.APPLICATION_JSON),
+                Arguments.of("post", "/api/v1/comments", "user", roles, 400, false, true, MediaType.APPLICATION_JSON),
+                Arguments.of("put", "/api/v1/comments/1", null, null, 302, true, true, MediaType.APPLICATION_JSON),
+                Arguments.of("put", "/api/v1/comments/1", "user", roles, 400, false, true, MediaType.APPLICATION_JSON),
+                Arguments.of("delete", "/api/v1/comments/1", null, null, 302, true, true, null),
+                Arguments.of("delete", "/api/v1/comments/1", "user", roles, 204, false, true, null)
         );
     }
 
@@ -102,7 +102,8 @@ class SecurityWebControllerTest {
     @MethodSource("getTestData")
     void shouldReturnExpectedStatus(String method, String url,
                                     String userName, String[] roles,
-                                    int status, boolean checkLoginRedirection) throws Exception {
+                                    int status, boolean checkLoginRedirection,
+                                    boolean needsCsrf, MediaType contentType) throws Exception {
 
         var request = method2RequestBuilder(method, url);
 
@@ -110,10 +111,12 @@ class SecurityWebControllerTest {
             request = request.with(user(userName).roles(roles));
         }
 
-        if (!method.equals("get")) {
-            request = request.with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("{}");
+        if (needsCsrf) {
+            request = request.with(csrf());
+        }
+
+        if (nonNull(contentType)) {
+            request = request.contentType(contentType).content("{}");
         }
 
         ResultActions resultActions = mockMvc.perform(request)
