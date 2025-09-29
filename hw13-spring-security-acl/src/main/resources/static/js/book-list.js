@@ -20,44 +20,50 @@ document.addEventListener('DOMContentLoaded', function() {
             noBooksMessage.style.display = 'block';
             return;
         }
-
         noBooksMessage.style.display = 'none';
         tableContainer.style.display = 'block';
 
+        const currentUserRoleElement = document.getElementById('currentUserRole');
+        const currentUserRole = currentUserRoleElement ? currentUserRoleElement.value : null;
+        console.log('Current user role from page:', currentUserRole);
+
         let tableHtml = `
-            <table class="table table-striped table-hover align-middle">
-                <thead class="table-dark">
-                    <tr>
-                        <th scope="col">ID</th>
-                        <th scope="col">Title</th>
-                        <th scope="col">Author</th>
-                        <th scope="col">Genre</th>
-                        <th scope="col">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Author</th>
+                    <th scope="col">Genre</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
 
         books.forEach(book => {
+            const isAdmin = currentUserRole === 'ADMIN';
+            console.log('Is admin for book ' + book.id + ':', isAdmin);
+
             tableHtml += `
-                <tr>
-                    <td>${book.id || ''}</td>
-                    <td>${book.title || ''}</td>
-                    <td>${book.author?.fullName || ''}</td>
-                    <td>${book.genre?.name || ''}</td>
-                    <td>
-                        <a href="/books/view/${book.id}" class="btn btn-info btn-sm me-1">View</a>
-                        <a href="/books/edit/${book.id}" class="btn btn-warning btn-sm me-1">Edit</a>
-                        <button class="btn btn-danger btn-sm" onclick="deleteBook('${book.id}')">Delete</button>
-                    </td>
-                </tr>
-            `;
+            <tr>
+                <td>${book.id || ''}</td>
+                <td>${book.title || ''}</td>
+                <td>${book.author?.fullName || ''}</td>
+                <td>${book.genre?.name || ''}</td>
+                <td>
+                    <a href="/books/view/${book.id}" class="btn btn-info btn-sm me-1">View</a>
+                    ${isAdmin ? `<a href="/books/edit/${book.id}" class="btn btn-warning btn-sm me-1">Edit</a>` : ''}
+                    ${isAdmin ? `<button class="btn btn-danger btn-sm" onclick="deleteBook('${book.id}')">Delete</button>` : ''}
+                </td>
+            </tr>
+        `;
         });
 
         tableHtml += `
-                </tbody>
-            </table>
-        `;
+            </tbody>
+        </table>
+    `;
 
         tableContainer.innerHTML = tableHtml;
     }

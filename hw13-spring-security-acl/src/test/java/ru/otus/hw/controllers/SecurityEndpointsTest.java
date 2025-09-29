@@ -47,6 +47,7 @@ class SecurityEndpointsTest {
 
     public static Stream<Arguments> getTestData() {
         var roles = new String[]{"USER"};
+        var adminRoles = new String[]{"ADMIN"};
         return Stream.of(
                 Arguments.of("get", "/", null, null, 302, true),
                 Arguments.of("get", "/books", null, null, 302, true),
@@ -62,13 +63,17 @@ class SecurityEndpointsTest {
 
                 Arguments.of("get", "/", "user", roles, 302, false),
                 Arguments.of("get", "/books", "user", roles, 200, false),
-                Arguments.of("get", "/books/create", "user", roles, 200, false),
+                Arguments.of("get", "/books/create", "user", roles, 403, false),
+                Arguments.of("get", "/books/edit/1", "user", roles, 403, false),
                 Arguments.of("get", "/authors", "user", roles, 200, false),
                 Arguments.of("get", "/genres", "user", roles, 200, false),
                 Arguments.of("post", "/perform_logout", "user", roles, 302, false),
 
                 Arguments.of("get", "/login", null, null, 200, false),
-                Arguments.of("get", "/login", "user", roles, 200, false)
+                Arguments.of("get", "/login", "user", roles, 200, false),
+
+                Arguments.of("get", "/books/create", "admin", adminRoles, 200, false),
+                Arguments.of("get", "/books/edit/1", "admin", adminRoles, 200, false)
         );
     }
 

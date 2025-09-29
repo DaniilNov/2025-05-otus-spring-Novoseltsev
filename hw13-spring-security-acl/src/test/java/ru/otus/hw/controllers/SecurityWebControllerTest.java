@@ -22,6 +22,7 @@ import ru.otus.hw.services.AuthorService;
 import ru.otus.hw.services.BookService;
 import ru.otus.hw.services.CommentService;
 import ru.otus.hw.services.GenreService;
+import ru.otus.hw.services.UserServiceImpl;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -58,6 +59,9 @@ class SecurityWebControllerTest {
     @MockBean
     private CommentService commentService;
 
+    @MockBean
+    private UserServiceImpl userService;
+
     private MockHttpServletRequestBuilder method2RequestBuilder(String method, String url) {
         Map<String, Function<String, MockHttpServletRequestBuilder>> methodMap =
                 Map.of("get", MockMvcRequestBuilders::get,
@@ -69,6 +73,7 @@ class SecurityWebControllerTest {
 
     public static Stream<Arguments> getTestData() {
         var roles = new String[]{"USER"};
+        var adminRoles = new String[]{"ADMIN"};
         return Stream.of(
                 Arguments.of("get", "/api/v1/authors", null, null, 302, true, false, null),
                 Arguments.of("get", "/api/v1/authors", "user", roles, 200, false, false, null),
@@ -77,11 +82,11 @@ class SecurityWebControllerTest {
                 Arguments.of("get", "/api/v1/books/1", null, null, 302, true, false, null),
                 Arguments.of("get", "/api/v1/books/1", "user", roles, 404, false, false, null),
                 Arguments.of("post", "/api/v1/books", null, null, 302, true, true, MediaType.APPLICATION_JSON),
-                Arguments.of("post", "/api/v1/books", "user", roles, 400, false, true, MediaType.APPLICATION_JSON),
+                Arguments.of("post", "/api/v1/books", "user", roles, 403, false, true, MediaType.APPLICATION_JSON),
                 Arguments.of("put", "/api/v1/books/1", null, null, 302, true, true, MediaType.APPLICATION_JSON),
-                Arguments.of("put", "/api/v1/books/1", "user", roles, 400, false, true, MediaType.APPLICATION_JSON),
+                Arguments.of("put", "/api/v1/books/1", "user", roles, 403, false, true, MediaType.APPLICATION_JSON),
                 Arguments.of("delete", "/api/v1/books/1", null, null, 302, true, true, null),
-                Arguments.of("delete", "/api/v1/books/1", "user", roles, 204, false, true, null),
+                Arguments.of("delete", "/api/v1/books/1", "user", roles, 403, false, true, null),
                 Arguments.of("get", "/api/v1/genres", null, null, 302, true, false, null),
                 Arguments.of("get", "/api/v1/genres", "user", roles, 200, false, false, null),
                 Arguments.of("get", "/api/v1/comments/book/1", null, null, 302, true, false, null),
@@ -91,9 +96,12 @@ class SecurityWebControllerTest {
                 Arguments.of("post", "/api/v1/comments", null, null, 302, true, true, MediaType.APPLICATION_JSON),
                 Arguments.of("post", "/api/v1/comments", "user", roles, 400, false, true, MediaType.APPLICATION_JSON),
                 Arguments.of("put", "/api/v1/comments/1", null, null, 302, true, true, MediaType.APPLICATION_JSON),
-                Arguments.of("put", "/api/v1/comments/1", "user", roles, 400, false, true, MediaType.APPLICATION_JSON),
                 Arguments.of("delete", "/api/v1/comments/1", null, null, 302, true, true, null),
-                Arguments.of("delete", "/api/v1/comments/1", "user", roles, 204, false, true, null)
+                Arguments.of("post", "/api/v1/books", "admin", adminRoles, 400, false, true, MediaType.APPLICATION_JSON),
+                Arguments.of("put", "/api/v1/books/1", "admin", adminRoles, 400, false, true, MediaType.APPLICATION_JSON),
+                Arguments.of("delete", "/api/v1/books/1", "admin", adminRoles, 204, false, true, null),
+                Arguments.of("put", "/api/v1/comments/1", "admin", adminRoles, 400, false, true, MediaType.APPLICATION_JSON),
+                Arguments.of("delete", "/api/v1/comments/1", "admin", adminRoles, 204, false, true, null)
         );
     }
 

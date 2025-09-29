@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>View Comment - Library</title>
@@ -32,10 +32,13 @@
                 <p class="card-text"><strong>Book:</strong>
                     <a th:href="@{/books/view/{id}(id=${comment.book.id})}" th:text="${comment.book.title}"></a>
                 </p>
+                <p class="card-text"><strong>Author:</strong> <span th:text="${comment.user.username}"></span></p>
             </div>
         </div>
         <a th:href="@{/books/view/{id}(id=${comment.book.id})}" class="btn btn-secondary mt-3">Back to Book</a>
-        <a th:href="@{/comments/edit/{id}(id=${comment.id})}" class="btn btn-warning mt-3">Edit Comment</a>
+        <div sec:authorize="hasRole('ADMIN') or #comment.user.username == authentication.name">
+            <a th:href="@{/comments/edit/{id}(id=${comment.id})}" class="btn btn-warning mt-3">Edit Comment</a>
+        </div>
     </div>
 </div>
 </body>

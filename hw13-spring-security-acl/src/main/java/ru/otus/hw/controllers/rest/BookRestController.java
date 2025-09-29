@@ -30,7 +30,7 @@ public class BookRestController {
     }
 
     @GetMapping("/api/v1/books/{id}")
-    public ResponseEntity<Book> getBookById(@PathVariable String id) {
+    public ResponseEntity<Book> getBookById(@PathVariable("id") String id) {
         Optional<Book> book = bookService.findById(id);
         return book.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -43,13 +43,14 @@ public class BookRestController {
     }
 
     @PutMapping("/api/v1/books/{id}")
-    public ResponseEntity<Book> updateBook(@PathVariable String id, @Valid @RequestBody BookUpdateDto bookDto) {
+    public ResponseEntity<Book> updateBook(@PathVariable("id") String id,
+                                           @Valid @RequestBody BookUpdateDto bookDto) {
         Book book = bookService.update(id, bookDto.getTitle(), bookDto.getAuthorId(), bookDto.getGenreId());
         return ResponseEntity.ok(book);
     }
 
     @DeleteMapping("/api/v1/books/{id}")
-    public ResponseEntity<Void> deleteBook(@PathVariable String id) {
+    public ResponseEntity<Void> deleteBook(@PathVariable("id") String id) {
         bookService.deleteById(id);
         return ResponseEntity.noContent().build();
     }

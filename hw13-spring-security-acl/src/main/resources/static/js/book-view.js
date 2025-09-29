@@ -2,8 +2,30 @@ document.addEventListener('DOMContentLoaded', function () {
     const api = new LibraryApi();
     const bookId = window.location.pathname.split('/').pop();
 
+    window.deleteComment = async function (id) {
+        if (confirm('Are you sure you want to delete this comment?')) {
+            try {
+                await api.deleteComment(id);
+                loadComments();
+            } catch (error) {
+                console.error('Error deleting comment:', error);
+                alert('Error deleting comment: ' + error.message);
+            }
+        }
+    };
+
     loadBookDetails();
     loadComments();
+
+
+    const currentUsernameElement = document.getElementById('currentUsername');
+    const currentUsername = currentUsernameElement ? currentUsernameElement.value : null;
+    console.log('Current username from page (in DOMContentLoaded):', currentUsername);
+
+    const isAdminElement = document.getElementById('isAdminUser');
+
+    const isAdminUser = isAdminElement ? isAdminElement.value === 'true' : false;
+    console.log('Is current user admin (from page):', isAdminUser);
 
     document.getElementById('addCommentBtn').addEventListener('click', function () {
         window.location.href = `/comments/create?bookId=${bookId}`;
@@ -44,12 +66,16 @@ document.addEventListener('DOMContentLoaded', function () {
         noCommentsMessage.style.display = 'none';
         tableContainer.style.display = 'block';
 
+        console.log('Current username in renderCommentsTable:', currentUsername);
+        console.log('Is admin in renderCommentsTable:', isAdminUser);
+
         let tableHtml = `
             <table class="table table-striped table-hover align-middle">
                 <thead>
                 <tr>
                     <th scope="col">ID</th>
                     <th scope="col">Text</th>
+                    <th scope="col">Author</th>
                     <th scope="col">Actions</th>
                 </tr>
                 </thead>
@@ -57,13 +83,17 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
 
         comments.forEach(comment => {
+            const canEditOrDelete = currentUsername && (comment.user?.username === currentUsername || isAdminUser);
+            const authorName = comment.user?.username || 'Unknown';
+
             tableHtml += `
                 <tr>
                     <td>${comment.id || ''}</td>
                     <td>${comment.text || ''}</td>
+                    <td>${authorName}</td>
                     <td>
-                        <a href="/comments/edit/${comment.id}" class="btn btn-outline-warning btn-sm me-2">Edit</a>
-                        <button class="btn btn-outline-danger btn-sm" onclick="deleteComment('${comment.id}')">Delete</button>
+                        ${canEditOrDelete ? `<a href="/comments/edit/${comment.id}" class="btn btn-outline-warning btn-sm me-2">Edit</a>` : ''}
+                        ${canEditOrDelete ? `<button class="btn btn-outline-danger btn-sm" onclick="deleteComment('${comment.id}')">Delete</button>` : ''}
                     </td>
                 </tr>
             `;
@@ -77,14 +107,4 @@ document.addEventListener('DOMContentLoaded', function () {
         tableContainer.innerHTML = tableHtml;
     }
 
-    window.deleteComment = async function (id) {
-        if (confirm('Are you sure you want to delete this comment?')) {
-            try {
-                await api.deleteComment(id);
-                loadComments();
-            } catch (error) {
-                console.error('Error deleting comment:', error);
-            }
-        }
-    };
 });

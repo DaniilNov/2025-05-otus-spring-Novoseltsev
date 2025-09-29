@@ -7,12 +7,15 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.otus.hw.controllers.rest.dto.CommentCreateDto;
 import ru.otus.hw.controllers.rest.dto.CommentUpdateDto;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Comment;
+import ru.otus.hw.models.User;
 import ru.otus.hw.services.CommentService;
+import ru.otus.hw.services.UserServiceImpl;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,12 +46,18 @@ class CommentRestControllerTest {
     @MockBean
     private CommentService commentService;
 
+    @MockBean
+    private UserServiceImpl userService;
+
     @Test
+    @WithMockUser(username = "testuser")
     void getCommentsByBookIdShouldReturnCommentsList() throws Exception {
         Book book = new Book();
         book.setId("1");
-        Comment comment1 = new Comment("1", "Comment 1", book);
-        Comment comment2 = new Comment("2", "Comment 2", book);
+        User user = new User();
+        user.setId("user1");
+        Comment comment1 = new Comment("1", "Comment 1", book, user);
+        Comment comment2 = new Comment("2", "Comment 2", book, user);
         List<Comment> comments = List.of(comment1, comment2);
 
         when(commentService.findByBookId("1")).thenReturn(comments);
@@ -67,10 +76,13 @@ class CommentRestControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "testuser")
     void getCommentByIdExistingCommentShouldReturnComment() throws Exception {
         Book book = new Book();
         book.setId("1");
-        Comment comment = new Comment("1", "Comment Text", book);
+        User user = new User();
+        user.setId("user1");
+        Comment comment = new Comment("1", "Comment Text", book, user);
 
         when(commentService.findById("1")).thenReturn(Optional.of(comment));
 
@@ -79,12 +91,14 @@ class CommentRestControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value("1"))
                 .andExpect(jsonPath("$.text").value("Comment Text"))
-                .andExpect(jsonPath("$.book.id").value("1"));
+                .andExpect(jsonPath("$.book.id").value("1"))
+                .andExpect(jsonPath("$.user.id").value("user1"));
 
         verify(commentService, times(1)).findById("1");
     }
 
     @Test
+    @WithMockUser(username = "testuser")
     void getCommentByIdNonExistingCommentShouldReturnNotFound() throws Exception {
         when(commentService.findById("999")).thenReturn(Optional.empty());
 
@@ -95,13 +109,20 @@ class CommentRestControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "testuser")
     void createCommentValidDataShouldReturnCreatedComment() throws Exception {
         Book book = new Book();
         book.setId("1");
-        Comment comment = new Comment("1", "New Comment", book);
+        User author = new User();
+        author.setId("author1");
+        author.setUsername("testuser");
+
+        Comment comment = new Comment("1", "New Comment", book, author);
         CommentCreateDto commentCreateDto = new CommentCreateDto("New Comment", "1");
 
-        when(commentService.create(eq("New Comment"), eq("1"))).thenReturn(comment);
+        when(userService.loadUserByUsername("testuser")).thenReturn(author);
+
+        when(commentService.create(eq("New Comment"), eq("1"), eq(author))).thenReturn(comment);
 
         mockMvc.perform(post("/api/v1/comments")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -110,17 +131,24 @@ class CommentRestControllerTest {
                 .andExpect(jsonPath("$.id").value("1"))
                 .andExpect(jsonPath("$.text").value("New Comment"));
 
-        verify(commentService, times(1)).create("New Comment", "1");
+        verify(commentService, times(1)).create("New Comment", "1", author);
     }
 
     @Test
+    @WithMockUser(username = "testuser")
     void updateCommentValidDataShouldReturnUpdatedComment() throws Exception {
         Book book = new Book();
         book.setId("1");
-        Comment comment = new Comment("1", "Updated Comment", book);
+        User user = new User();
+        user.setId("user1");
+        user.setUsername("testuser");
+
+        Comment comment = new Comment("1", "Updated Comment", book, user);
         CommentUpdateDto commentUpdateDto = new CommentUpdateDto("Updated Comment");
 
-        when(commentService.update(eq("1"), eq("Updated Comment"))).thenReturn(comment);
+        when(userService.loadUserByUsername("testuser")).thenReturn(user);
+
+        when(commentService.update(eq("1"), eq("Updated Comment"), eq(user))).thenReturn(comment);
 
         mockMvc.perform(put("/api/v1/comments/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -129,20 +157,28 @@ class CommentRestControllerTest {
                 .andExpect(jsonPath("$.id").value("1"))
                 .andExpect(jsonPath("$.text").value("Updated Comment"));
 
-        verify(commentService, times(1)).update("1", "Updated Comment");
+        verify(commentService, times(1)).update("1", "Updated Comment", user);
     }
 
     @Test
+    @WithMockUser(username = "testuser")
     void deleteCommentShouldReturnNoContent() throws Exception {
-        doNothing().when(commentService).deleteById("1");
+        User user = new User();
+        user.setId("user1");
+        user.setUsername("testuser");
+
+        when(userService.loadUserByUsername("testuser")).thenReturn(user);
+
+        doNothing().when(commentService).deleteById("1", user);
 
         mockMvc.perform(delete("/api/v1/comments/1"))
                 .andExpect(status().isNoContent());
 
-        verify(commentService, times(1)).deleteById("1");
+        verify(commentService, times(1)).deleteById("1", user);
     }
 
     @Test
+    @WithMockUser(username = "testuser")
     void createCommentInvalidDataShouldReturnBadRequest() throws Exception {
         CommentCreateDto commentCreateDto = new CommentCreateDto("", "1");
 
@@ -153,6 +189,7 @@ class CommentRestControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "testuser")
     void updateCommentInvalidDataShouldReturnBadRequest() throws Exception {
         CommentUpdateDto commentUpdateDto = new CommentUpdateDto("");
 

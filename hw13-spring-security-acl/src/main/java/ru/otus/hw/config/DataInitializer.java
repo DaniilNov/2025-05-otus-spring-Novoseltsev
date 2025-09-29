@@ -85,6 +85,12 @@ public class DataInitializer implements CommandLineRunner {
             user.setRole("USER");
             userRepository.save(user);
 
+            User user2 = new User();
+            user2.setUsername("user2");
+            user2.setPassword(passwordEncoder.encode("password"));
+            user2.setRole("USER");
+            userRepository.save(user2);
+
             User admin = new User();
             admin.setUsername("admin");
             admin.setPassword(passwordEncoder.encode("admin"));
@@ -137,10 +143,15 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void createAndSaveComments(List<Book> books) {
-        Comment comment1 = new Comment(null, "Great book!", books.get(0));
-        Comment comment2 = new Comment(null, "Could be better", books.get(1));
-        Comment comment3 = new Comment(null, "Not bad", books.get(2));
-        commentRepository.saveAll(List.of(comment1, comment2, comment3));
+        User user = userRepository.findByUsername("user").orElse(null);
+        User user2 = userRepository.findByUsername("user2").orElse(null);
+        User admin = userRepository.findByUsername("admin").orElse(null);
+
+        Comment comment1 = new Comment(null, "Great book by user1!", books.get(0), user);
+        Comment comment2 = new Comment(null, "Could be better, from user2", books.get(1), user2);
+        Comment comment3 = new Comment(null, "Not bad, admin comment", books.get(2), admin);
+        Comment comment4 = new Comment(null, "Another comment by user1", books.get(1), user);
+        commentRepository.saveAll(List.of(comment1, comment2, comment3, comment4));
         log.debug("Saved {} comments", 3);
     }
 }

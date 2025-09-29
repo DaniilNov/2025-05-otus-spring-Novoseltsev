@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Edit Comment - Library</title>
@@ -30,14 +30,13 @@
         <h2>Edit Comment</h2>
         <form id="editCommentForm">
             <input type="hidden" id="commentId" name="commentId">
-            <!-- Скрытое поле bookId для редиректа после сохранения -->
             <input type="hidden" id="bookId" name="bookId">
             <div class="mb-3">
                 <label for="text" class="form-label">Comment Text:</label>
                 <textarea class="form-control" id="text" name="text" rows="3" required></textarea>
             </div>
             <button type="submit" class="btn btn-primary">Update Comment</button>
-            <a id="cancelLink" class="btn btn-secondary" href="/books">Cancel</a> <!-- Дефолтный href -->
+            <a id="cancelLink" class="btn btn-secondary" href="/books">Cancel</a>
         </form>
     </div>
 </div>

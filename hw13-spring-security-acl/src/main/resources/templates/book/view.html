@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>View Book - Library</title>
@@ -39,9 +39,11 @@
         <div class="card mb-4">
             <div class="card-header">
                 Comments
-                <button id="addCommentBtn" class="btn btn-primary btn-sm float-end">Add Comment</button>
+                <button sec:authorize="hasAnyRole('USER', 'ADMIN')" id="addCommentBtn" class="btn btn-primary btn-sm float-end">Add Comment</button>
             </div>
             <div class="card-body">
+                <input type="hidden" id="currentUsername" th:value="${#authentication.name}" />
+                <input type="hidden" id="isAdminUser" th:value="${#authorization.expression('hasRole(''ADMIN'')')}" />
                 <div id="commentsTable" class="table-responsive">
                 </div>
                 <div id="noCommentsMessage" class="text-muted" style="display: none;">No comments yet.</div>
@@ -49,7 +51,9 @@
         </div>
 
         <a th:href="@{/books}" class="btn btn-secondary">Back to Books</a>
-        <a id="editBookLink" class="btn btn-warning">Edit Book</a>
+        <div sec:authorize="hasRole('ADMIN')">
+            <a id="editBookLink" class="btn btn-warning">Edit Book</a>
+        </div>
     </div>
 </div>
 </body>

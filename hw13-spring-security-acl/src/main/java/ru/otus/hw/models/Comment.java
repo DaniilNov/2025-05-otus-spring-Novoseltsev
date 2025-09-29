@@ -24,4 +24,7 @@ public class Comment {
 
     @DBRef(lazy = true)
     private Book book;
+
+    @DBRef(lazy = true)
+    private User user;
 }

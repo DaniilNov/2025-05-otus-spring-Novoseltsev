@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Books List - Library</title>
@@ -22,13 +22,16 @@
                 <form th:action="@{/perform_logout}" method="post" class="d-flex align-items-center">
                     <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
                 </form>
-        </div>
+            </div>
     </nav>
 
     <div class="container">
         <h2>Books List</h2>
-        <a th:href="@{/books/create}" class="btn btn-primary mb-3">Add New Book</a>
+        <div sec:authorize="hasRole('ADMIN')">
+            <a th:href="@{/books/create}" class="btn btn-primary mb-3">Add New Book</a>
+        </div>
 
+        <input type="hidden" id="currentUserRole" th:value="${#authentication.authorities.?[getAuthority().startsWith('ROLE_')].![getAuthority().substring(5)].stream().findFirst().orElse(null)}" />
         <div id="booksTable" class="table-responsive">
         </div>
         <div id="noBooksMessage" class="text-muted" style="display: none;">No books found.</div>
