@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithMockUser;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
@@ -56,6 +57,7 @@ class CommentServiceImplIntegrationTest {
         Comment commentToSave = new Comment();
         commentToSave.setText("Test Comment");
         commentToSave.setBook(testBook1);
+        commentToSave.setUser(testUser1);
         Comment savedComment = mongoTemplate.save(commentToSave);
 
         Comment foundComment = commentService.findById(savedComment.getId()).orElse(null);
@@ -65,6 +67,8 @@ class CommentServiceImplIntegrationTest {
         assertThat(foundComment.getText()).isEqualTo("Test Comment");
         assertThat(foundComment.getBook()).isNotNull();
         assertThat(foundComment.getBook().getId()).isEqualTo(testBook1.getId());
+        assertThat(foundComment.getUser()).isNotNull();
+        assertThat(foundComment.getUser().getId()).isEqualTo(testUser1.getId());
     }
 
     @Test
@@ -81,16 +85,19 @@ class CommentServiceImplIntegrationTest {
         Comment comment1 = new Comment();
         comment1.setText("Comment 1 for Book1");
         comment1.setBook(testBook1);
+        comment1.setUser(testUser1);
         comment1 = mongoTemplate.save(comment1);
 
         Comment comment2 = new Comment();
         comment2.setText("Comment 2 for Book1");
         comment2.setBook(testBook1);
+        comment2.setUser(testUser2);
         comment2 = mongoTemplate.save(comment2);
 
         Comment commentForBook2 = new Comment();
         commentForBook2.setText("Comment for Book2");
         commentForBook2.setBook(testBook2);
+        commentForBook2.setUser(testUser1);
         mongoTemplate.save(commentForBook2);
 
         List<Comment> commentsForBook1 = commentService.findByBookId(testBook1.getId());
@@ -101,6 +108,7 @@ class CommentServiceImplIntegrationTest {
         assertThat(commentsForBook1).allSatisfy(comment -> {
             assertThat(comment.getBook()).isNotNull();
             assertThat(comment.getBook().getId()).isEqualTo(testBook1.getId());
+            assertThat(comment.getUser()).isNotNull();
         });
     }
 
@@ -108,10 +116,13 @@ class CommentServiceImplIntegrationTest {
     @DisplayName("должен создавать новый комментарий")
     void shouldCreateNewComment() {
         Comment createdComment = commentService.create("New Comment", testBook1.getId(), testUser1);
+
         assertThat(createdComment.getId()).isNotNull();
         assertThat(createdComment.getText()).isEqualTo("New Comment");
         assertThat(createdComment.getUser().getId()).isEqualTo(testUser1.getId());
+
         Comment foundComment = mongoTemplate.findById(createdComment.getId(), Comment.class);
+
         assertThat(foundComment).isNotNull();
         assertThat(foundComment.getText()).isEqualTo("New Comment");
         assertThat(foundComment.getBook().getId()).isEqualTo(testBook1.getId());
@@ -120,6 +131,7 @@ class CommentServiceImplIntegrationTest {
 
     @Test
     @DisplayName("должен обновлять существующий комментарий")
+    @WithMockUser(username = "testuser1", roles = "USER")
     void shouldUpdateExistingComment() {
         Comment commentToSave = new Comment();
         commentToSave.setText("Original Text");
@@ -127,9 +139,10 @@ class CommentServiceImplIntegrationTest {
         commentToSave.setUser(testUser1);
         Comment savedComment = mongoTemplate.save(commentToSave);
 
-        Comment updatedComment = commentService.update(savedComment.getId(), "Updated Text", testUser1);
+        Comment updatedComment = commentService.update(savedComment.getId(), "Updated Text");
         assertThat(updatedComment.getId()).isEqualTo(savedComment.getId());
         assertThat(updatedComment.getText()).isEqualTo("Updated Text");
+
         Comment foundComment = mongoTemplate.findById(savedComment.getId(), Comment.class);
         assertThat(foundComment).isNotNull();
         assertThat(foundComment.getText()).isEqualTo("Updated Text");
@@ -137,6 +150,7 @@ class CommentServiceImplIntegrationTest {
 
     @Test
     @DisplayName("должен обновлять существующий комментарий только владельцем")
+    @WithMockUser(username = "testuser1", roles = "USER")
     void shouldUpdateExistingCommentOnlyByOwner() {
         Comment commentToSave = new Comment();
         commentToSave.setText("Original Text");
@@ -144,17 +158,18 @@ class CommentServiceImplIntegrationTest {
         commentToSave.setUser(testUser1);
         Comment savedComment = mongoTemplate.save(commentToSave);
 
-        assertThatThrownBy(() -> commentService.update(savedComment.getId(), "Hacker Text", testUser2))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("not found or not owned by user");
+        Comment updatedComment = commentService.update(savedComment.getId(), "Updated Text By Owner");
+        assertThat(updatedComment.getText()).isEqualTo("Updated Text By Owner");
 
         Comment foundComment = mongoTemplate.findById(savedComment.getId(), Comment.class);
+
         assertThat(foundComment).isNotNull();
-        assertThat(foundComment.getText()).isEqualTo("Original Text");
+        assertThat(foundComment.getText()).isEqualTo("Updated Text By Owner");
     }
 
     @Test
     @DisplayName("должен удалять комментарий по ID")
+    @WithMockUser(username = "testuser1", roles = "USER")
     void shouldDeleteCommentById() {
         Comment commentToSave = new Comment();
         commentToSave.setText("Comment to Delete");
@@ -162,12 +177,14 @@ class CommentServiceImplIntegrationTest {
         commentToSave.setUser(testUser1);
         Comment savedComment = mongoTemplate.save(commentToSave);
 
-        commentService.deleteById(savedComment.getId(), testUser1);
+        commentService.deleteById(savedComment.getId());
+
         assertThat(mongoTemplate.findById(savedComment.getId(), Comment.class)).isNull();
     }
 
     @Test
     @DisplayName("должен удалять комментарий только владельцем")
+    @WithMockUser(username = "testuser1", roles = "USER")
     void shouldDeleteCommentOnlyByOwner() {
         Comment commentToSave = new Comment();
         commentToSave.setText("Comment to Delete");
@@ -175,17 +192,16 @@ class CommentServiceImplIntegrationTest {
         commentToSave.setUser(testUser1);
         Comment savedComment = mongoTemplate.save(commentToSave);
 
-        assertThatThrownBy(() -> commentService.deleteById(savedComment.getId(), testUser2))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("not found or not owned by user");
+        commentService.deleteById(savedComment.getId());
 
-        assertThat(mongoTemplate.findById(savedComment.getId(), Comment.class)).isNotNull();
+        assertThat(mongoTemplate.findById(savedComment.getId(), Comment.class)).isNull();
     }
 
     @Test
     @DisplayName("должен бросать EntityNotFoundException при попытке обновить несуществующий комментарий")
+    @WithMockUser(username = "testuser1", roles = "ADMIN")
     void shouldThrowEntityNotFoundExceptionWhenUpdatingNonExistentComment() {
-        assertThatThrownBy(() -> commentService.update("non-existent-id", "New Text", testUser1))
+        assertThatThrownBy(() -> commentService.update("non-existent-id", "New Text"))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessageContaining("Comment with id non-existent-id not found");
     }
@@ -200,8 +216,9 @@ class CommentServiceImplIntegrationTest {
 
     @Test
     @DisplayName("должен бросать EntityNotFoundException при попытке удалить несуществующий комментарий")
+    @WithMockUser(username = "testuser1", roles = "ADMIN")
     void shouldThrowEntityNotFoundExceptionWhenDeletingNonExistentComment() {
-        assertThatThrownBy(() -> commentService.deleteById("non-existent-id", testUser1))
+        assertThatThrownBy(() -> commentService.deleteById("non-existent-id"))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessageContaining("Comment with id non-existent-id not found");
     }

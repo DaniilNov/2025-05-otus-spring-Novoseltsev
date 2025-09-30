@@ -1,8 +1,7 @@
 package ru.otus.hw.services;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.exceptions.EntityNotFoundException;
@@ -26,15 +25,6 @@ public class CommentServiceImpl implements CommentService {
 
     private final UserRepository userRepository;
 
-    private boolean isAdmin() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getAuthorities() != null) {
-            return authentication.getAuthorities().stream()
-                    .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
-        }
-        return false;
-    }
-
     @Transactional(readOnly = true)
     @Override
     public Optional<Comment> findById(String id) {
@@ -45,15 +35,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<Comment> findByBookId(String bookId) {
         return commentRepository.findByBookId(bookId);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public List<Comment> findByUser(User user) {
-        if (user == null || user.getId() == null) {
-            return List.of();
-        }
-        return commentRepository.findByUserId(user.getId());
     }
 
     @Transactional
@@ -73,11 +54,8 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
-    public Comment update(String id, String text, User user) {
-        if (!isAdmin() && !isOwner(id, user.getId())) {
-            throw new EntityNotFoundException("Comment with id %s not found or not owned by user %s"
-                    .formatted(id, user.getId()));
-        }
+    @PreAuthorize("hasRole('ADMIN') or @commentServiceImpl.isOwnerByIdAndUsername(#id, authentication.name)")
+    public Comment update(String id, String text) {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Comment with id %s not found".formatted(id)));
         comment.setText(text);
@@ -86,16 +64,24 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
-    public void deleteById(String id, User user) {
-        if (!isAdmin() && !isOwner(id, user.getId())) {
-            throw new EntityNotFoundException("Comment with id %s not found or not owned by user %s"
-                    .formatted(id, user.getId()));
+    @PreAuthorize("hasRole('ADMIN') or @commentServiceImpl.isOwnerByIdAndUsername(#id, authentication.name)")
+    public void deleteById(String id) {
+        if (!commentRepository.existsById(id)) {
+            throw new EntityNotFoundException("Comment with id %s not found".formatted(id));
         }
         commentRepository.deleteById(id);
     }
 
-    @Override
-    public boolean isOwner(String commentId, String userId) {
-        return commentRepository.existsByIdAndUserId(commentId, userId);
+    public boolean isOwnerByIdAndUsername(String commentId, String username) {
+        Optional<Comment> commentOpt = commentRepository.findById(commentId);
+        if (commentOpt.isPresent()) {
+            Comment comment = commentOpt.get();
+            User commentUser = comment.getUser();
+            if (commentUser != null) {
+                Optional<User> userOpt = userRepository.findByUsername(username);
+                return userOpt.isPresent() && userOpt.get().getId().equals(commentUser.getId());
+            }
+        }
+        return false;
     }
 }

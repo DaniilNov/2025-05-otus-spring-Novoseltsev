@@ -11,13 +11,11 @@ public interface CommentService {
 
     List<Comment> findByBookId(String bookId);
 
-    List<Comment> findByUser(User user);
-
     Comment create(String text, String bookId, User author);
 
-    Comment update(String id, String text, User user);
+    Comment update(String id, String text);
 
-    void deleteById(String id, User user);
+    void deleteById(String id);
 
-    boolean isOwner(String commentId, String userId);
+    boolean isOwnerByIdAndUsername(String commentId, String username);
 }

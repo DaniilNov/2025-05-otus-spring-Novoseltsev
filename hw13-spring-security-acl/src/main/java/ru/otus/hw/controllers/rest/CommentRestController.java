@@ -2,9 +2,9 @@ package ru.otus.hw.controllers.rest;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,17 +19,18 @@ import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Comment;
 import ru.otus.hw.models.User;
 import ru.otus.hw.services.CommentService;
-import ru.otus.hw.services.UserServiceImpl;
+import ru.otus.hw.services.UserService;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class CommentRestController {
 
     private final CommentService commentService;
 
-    private final UserServiceImpl userService;
+    private final UserService userService;
 
     @GetMapping("/api/v1/comments/book/{bookId}")
     public ResponseEntity<List<Comment>> getCommentsByBookId(@PathVariable("bookId") String bookId) {
@@ -44,11 +45,10 @@ public class CommentRestController {
     }
 
     @PostMapping("/api/v1/comments")
-    public ResponseEntity<Comment> createComment(@Valid @RequestBody CommentCreateDto commentDto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        UserDetails userDetails = userService.loadUserByUsername(username);
-        User author = (User) userDetails;
+    public ResponseEntity<Comment> createComment(@Valid @RequestBody CommentCreateDto commentDto,
+                                                 @AuthenticationPrincipal UserDetails currentUserDetails) {
+        String username = currentUserDetails.getUsername();
+        User author = (User) userService.loadUserByUsername(username);
 
         Comment comment = commentService.create(commentDto.getText(), commentDto.getBookId(), author);
         return ResponseEntity.status(201).body(comment);
@@ -57,14 +57,9 @@ public class CommentRestController {
     @PutMapping("/api/v1/comments/{id}")
     public ResponseEntity<Comment> updateComment(@PathVariable("id") String id,
                                                  @Valid @RequestBody CommentUpdateDto commentDto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        UserDetails userDetails = userService.loadUserByUsername(username);
-        User user = (User) userDetails;
-
         Comment comment;
         try {
-            comment = commentService.update(id, commentDto.getText(), user);
+            comment = commentService.update(id, commentDto.getText());
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
@@ -73,13 +68,8 @@ public class CommentRestController {
 
     @DeleteMapping("/api/v1/comments/{id}")
     public ResponseEntity<Void> deleteComment(@PathVariable("id") String id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        UserDetails userDetails = userService.loadUserByUsername(username);
-        User user = (User) userDetails;
-
         try {
-            commentService.deleteById(id, user);
+            commentService.deleteById(id);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
         }

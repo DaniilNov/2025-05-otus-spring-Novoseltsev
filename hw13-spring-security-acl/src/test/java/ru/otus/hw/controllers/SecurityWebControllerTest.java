@@ -22,7 +22,7 @@ import ru.otus.hw.services.AuthorService;
 import ru.otus.hw.services.BookService;
 import ru.otus.hw.services.CommentService;
 import ru.otus.hw.services.GenreService;
-import ru.otus.hw.services.UserServiceImpl;
+import ru.otus.hw.services.UserService;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -60,7 +60,7 @@ class SecurityWebControllerTest {
     private CommentService commentService;
 
     @MockBean
-    private UserServiceImpl userService;
+    private UserService userService;
 
     private MockHttpServletRequestBuilder method2RequestBuilder(String method, String url) {
         Map<String, Function<String, MockHttpServletRequestBuilder>> methodMap =
