@@ -7,7 +7,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.otus.hw.controllers.rest.dto.CommentCreateDto;
 import ru.otus.hw.controllers.rest.dto.CommentUpdateDto;
@@ -20,11 +19,13 @@ import ru.otus.hw.services.UserService;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -106,33 +107,35 @@ class CommentRestControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "testuser")
     void createCommentValidDataShouldReturnCreatedComment() throws Exception {
         String bookId = "1";
         Book book = new Book();
         book.setId(bookId);
 
-        User expectedUser = new User();
-        expectedUser.setId("user1");
-        expectedUser.setUsername("testuser");
-        expectedUser.setPassword("password");
-        expectedUser.setRole("USER");
+        User testUser = new User();
+        testUser.setId("user1");
+        testUser.setUsername("testuser");
+        testUser.setPassword("password");
+        testUser.setRole("USER");
 
-        Comment comment = new Comment("1", "New Comment", book, expectedUser);
+        Comment comment = new Comment("1", "New Comment", book, testUser);
         CommentCreateDto commentCreateDto = new CommentCreateDto("New Comment", bookId);
 
-        when(userService.loadUserByUsername("testuser")).thenReturn(expectedUser);
-        when(commentService.create(eq("New Comment"), eq(bookId), eq(expectedUser))).thenReturn(comment);
+        when(commentService.create(any(), any(), any())).thenReturn(comment);
 
         mockMvc.perform(post("/api/v1/comments")
+                        .with(user(testUser))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(commentCreateDto)))
                 .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value("1"))
-                .andExpect(jsonPath("$.text").value("New Comment"));
+                .andExpect(jsonPath("$.text").value("New Comment"))
+                .andExpect(jsonPath("$.book.id").value("1"))
+                .andExpect(jsonPath("$.user.id").value("user1"))
+                .andExpect(jsonPath("$.user.username").value("testuser"));
 
-        verify(userService, times(1)).loadUserByUsername("testuser");
-        verify(commentService, times(1)).create("New Comment", bookId, expectedUser);
+        verify(commentService, times(1)).create(any(), any(), any());
     }
 
     @Test

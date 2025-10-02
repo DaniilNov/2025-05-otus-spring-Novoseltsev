@@ -54,7 +54,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
-    @PreAuthorize("hasRole('ADMIN') or @commentServiceImpl.isOwnerByIdAndUsername(#id, authentication.name)")
+    @PreAuthorize("hasRole('ADMIN') or @commentServiceImpl.isOwnerByIdAndUser(#id, authentication.principal)")
     public Comment update(String id, String text) {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Comment with id %s not found".formatted(id)));
@@ -64,7 +64,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
-    @PreAuthorize("hasRole('ADMIN') or @commentServiceImpl.isOwnerByIdAndUsername(#id, authentication.name)")
+    @PreAuthorize("hasRole('ADMIN') or @commentServiceImpl.isOwnerByIdAndUser(#id, authentication.principal)")
     public void deleteById(String id) {
         if (!commentRepository.existsById(id)) {
             throw new EntityNotFoundException("Comment with id %s not found".formatted(id));
@@ -72,16 +72,7 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.deleteById(id);
     }
 
-    public boolean isOwnerByIdAndUsername(String commentId, String username) {
-        Optional<Comment> commentOpt = commentRepository.findById(commentId);
-        if (commentOpt.isPresent()) {
-            Comment comment = commentOpt.get();
-            User commentUser = comment.getUser();
-            if (commentUser != null) {
-                Optional<User> userOpt = userRepository.findByUsername(username);
-                return userOpt.isPresent() && userOpt.get().getId().equals(commentUser.getId());
-            }
-        }
-        return false;
+    public boolean isOwnerByIdAndUser(String commentId, User user) {
+        return commentRepository.existsByIdAndUser(commentId, user);
     }
 }

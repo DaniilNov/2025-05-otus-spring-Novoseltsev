@@ -17,5 +17,5 @@ public interface CommentService {
 
     void deleteById(String id);
 
-    boolean isOwnerByIdAndUsername(String commentId, String username);
+    boolean isOwnerByIdAndUser(String commentId, User user);
 }

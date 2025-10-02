@@ -2,6 +2,7 @@ package ru.otus.hw.repositories;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import ru.otus.hw.models.Comment;
+import ru.otus.hw.models.User;
 
 import java.util.List;
 
@@ -12,5 +13,5 @@ public interface CommentRepository extends MongoRepository<Comment, String> {
 
     void deleteByBookId(String bookId);
 
-    boolean existsByIdAndUserId(String commentId, String userId);
+    boolean existsByIdAndUser(String id, User user);
 }

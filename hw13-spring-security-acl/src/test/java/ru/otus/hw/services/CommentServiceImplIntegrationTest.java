@@ -6,6 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Author;
@@ -131,13 +135,14 @@ class CommentServiceImplIntegrationTest {
 
     @Test
     @DisplayName("должен обновлять существующий комментарий")
-    @WithMockUser(username = "testuser1", roles = "USER")
     void shouldUpdateExistingComment() {
         Comment commentToSave = new Comment();
         commentToSave.setText("Original Text");
         commentToSave.setBook(testBook1);
         commentToSave.setUser(testUser1);
         Comment savedComment = mongoTemplate.save(commentToSave);
+
+        setAuthenticationUser(testUser1, "USER");
 
         Comment updatedComment = commentService.update(savedComment.getId(), "Updated Text");
         assertThat(updatedComment.getId()).isEqualTo(savedComment.getId());
@@ -150,13 +155,14 @@ class CommentServiceImplIntegrationTest {
 
     @Test
     @DisplayName("должен обновлять существующий комментарий только владельцем")
-    @WithMockUser(username = "testuser1", roles = "USER")
     void shouldUpdateExistingCommentOnlyByOwner() {
         Comment commentToSave = new Comment();
         commentToSave.setText("Original Text");
         commentToSave.setBook(testBook1);
         commentToSave.setUser(testUser1);
         Comment savedComment = mongoTemplate.save(commentToSave);
+
+        setAuthenticationUser(testUser1, "USER");
 
         Comment updatedComment = commentService.update(savedComment.getId(), "Updated Text By Owner");
         assertThat(updatedComment.getText()).isEqualTo("Updated Text By Owner");
@@ -169,13 +175,14 @@ class CommentServiceImplIntegrationTest {
 
     @Test
     @DisplayName("должен удалять комментарий по ID")
-    @WithMockUser(username = "testuser1", roles = "USER")
     void shouldDeleteCommentById() {
         Comment commentToSave = new Comment();
         commentToSave.setText("Comment to Delete");
         commentToSave.setBook(testBook1);
         commentToSave.setUser(testUser1);
         Comment savedComment = mongoTemplate.save(commentToSave);
+
+        setAuthenticationUser(testUser1, "USER");
 
         commentService.deleteById(savedComment.getId());
 
@@ -184,13 +191,14 @@ class CommentServiceImplIntegrationTest {
 
     @Test
     @DisplayName("должен удалять комментарий только владельцем")
-    @WithMockUser(username = "testuser1", roles = "USER")
     void shouldDeleteCommentOnlyByOwner() {
         Comment commentToSave = new Comment();
         commentToSave.setText("Comment to Delete");
         commentToSave.setBook(testBook1);
         commentToSave.setUser(testUser1);
         Comment savedComment = mongoTemplate.save(commentToSave);
+
+        setAuthenticationUser(testUser1, "USER");
 
         commentService.deleteById(savedComment.getId());
 
@@ -221,5 +229,14 @@ class CommentServiceImplIntegrationTest {
         assertThatThrownBy(() -> commentService.deleteById("non-existent-id"))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessageContaining("Comment with id non-existent-id not found");
+    }
+
+    private void setAuthenticationUser(User user, String role) {
+        Authentication auth = new UsernamePasswordAuthenticationToken(
+                user,
+                "password",
+                List.of(new SimpleGrantedAuthority("ROLE_" + role))
+        );
+        SecurityContextHolder.getContext().setAuthentication(auth);
     }
 }
