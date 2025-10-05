@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: hw14-spring-batch
+  main:
+    allow-circular-references: true
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/maindb
+
+  datasource:
+    url: jdbc:h2:mem:targetdb
+    username: sa
+    password: password
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+
+  h2:
+    console:
+      enabled: true
+
+  batch:
+    job:
+      enabled: false
+    jdbc:
+      initialize-schema: always
+
+mongock:
+  change-logs-scan-package: ru.otus.hw.changelogs
+  enabled: true
+  runner-type: "InitializingBean"
+
+logging:
+  level:
+    org.springframework.batch: INFO
+    ru.otus.hw: INFO
+    org.hibernate.SQL: WARN
+
+app:
+  batch:
+    chunk-size: 10
