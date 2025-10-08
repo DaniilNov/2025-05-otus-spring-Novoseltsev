@@ -30,11 +30,9 @@ import java.util.Map;
 @Slf4j
 public class BatchConfiguration {
 
-
     private final BookItemProcessor bookItemProcessor;
 
     private final BookItemWriter bookItemWriter;
-
 
     private final CommentItemProcessor commentItemProcessor;
 
