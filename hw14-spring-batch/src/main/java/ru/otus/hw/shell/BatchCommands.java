@@ -11,6 +11,7 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import ru.otus.hw.service.AuthorMappingService;
 import ru.otus.hw.service.GenreMappingService;
+import ru.otus.hw.service.PreloadService;
 import ru.otus.hw.service.TemporaryMappingService;
 
 @ShellComponent
@@ -22,6 +23,8 @@ public class BatchCommands {
 
     private final Job migrateLibraryJob;
 
+    private final PreloadService preloadService;
+
     private final AuthorMappingService authorMappingService;
 
     private final GenreMappingService genreMappingService;
@@ -31,8 +34,9 @@ public class BatchCommands {
     @ShellMethod(value = "Start migration from MongoDB to H2", key = {"migrate", "start-migration"})
     public String startMigration() {
         try {
-            authorMappingService.clearCache();
-            genreMappingService.clearCache();
+            preloadService.preloadAuthorsAndGenres();
+            authorMappingService.loadAuthorsToCache();
+            genreMappingService.loadGenresToCache();
             temporaryMappingService.clear();
 
             JobParameters jobParameters = new JobParametersBuilder()
@@ -50,5 +54,4 @@ public class BatchCommands {
             return "Migration failed: " + e.getMessage();
         }
     }
-
 }

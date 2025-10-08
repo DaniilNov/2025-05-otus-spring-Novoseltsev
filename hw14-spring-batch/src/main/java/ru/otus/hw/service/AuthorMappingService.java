@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.models.jpa.Author;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -13,39 +14,29 @@ import java.util.concurrent.ConcurrentHashMap;
 public class AuthorMappingService {
 
     private final EntityManager entityManager;
-
     private final ConcurrentHashMap<String, Author> authorCache = new ConcurrentHashMap<>();
 
-    @Transactional
+    @Transactional(readOnly = true)
+    public void loadAuthorsToCache() {
+        List<Author> existingAuthors = entityManager
+                .createQuery("SELECT a FROM Author a", Author.class)
+                .getResultList();
+
+        authorCache.clear();
+        existingAuthors.forEach(author ->
+                authorCache.put(author.getFullName(), author));
+    }
+
     public Author getOrCreateAuthor(ru.otus.hw.models.mongo.Author mongoAuthor) {
         String authorName = mongoAuthor.getFullName();
+        Author author = authorCache.get(authorName);
 
-        return authorCache.computeIfAbsent(authorName, name -> {
-            Author existing = findAuthorByName(name);
-            if (existing != null) {
-                return existing;
-            }
-
-            Author newAuthor = new Author();
-            newAuthor.setFullName(name);
-            entityManager.persist(newAuthor);
-            entityManager.flush();
-            return newAuthor;
-        });
-    }
-
-    private Author findAuthorByName(String fullName) {
-        try {
-            return entityManager.createQuery(
-                            "SELECT a FROM Author a WHERE a.fullName = :fullName", Author.class)
-                    .setParameter("fullName", fullName)
-                    .getSingleResult();
-        } catch (Exception e) {
-            return null;
+        if (author == null) {
+            throw new IllegalStateException("Author not found in cache: " + authorName +
+                    ". Make sure preload was executed.");
         }
+
+        return author;
     }
 
-    public void clearCache() {
-        authorCache.clear();
-    }
 }

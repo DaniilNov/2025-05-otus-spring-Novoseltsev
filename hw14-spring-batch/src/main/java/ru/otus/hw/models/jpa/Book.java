@@ -24,12 +24,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@NamedEntityGraph(name = "Book.withAuthorAndGenre",
-        attributeNodes = {
-                @NamedAttributeNode("author"),
-                @NamedAttributeNode("genre")
-        }
-)
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
