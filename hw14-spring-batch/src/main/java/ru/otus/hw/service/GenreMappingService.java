@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GenreMappingService {
 
     private final EntityManager entityManager;
+
     private final ConcurrentHashMap<String, Genre> genreCache = new ConcurrentHashMap<>();
 
     @Transactional(readOnly = true)

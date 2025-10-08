@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class AuthorMappingService {
 
     private final EntityManager entityManager;
+
     private final ConcurrentHashMap<String, Author> authorCache = new ConcurrentHashMap<>();
 
     @Transactional(readOnly = true)
