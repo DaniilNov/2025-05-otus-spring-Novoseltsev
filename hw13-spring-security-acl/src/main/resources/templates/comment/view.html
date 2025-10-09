@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>View Comment - Library</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+</head>
+<body>
+<div class="container-fluid">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/}">Library</a>
+            <div class="navbar-nav">
+                <a class="nav-link active" th:href="@{/books}">Books</a>
+                <a class="nav-link" th:href="@{/authors}">Authors</a>
+                <a class="nav-link" th:href="@{/genres}">Genres</a>
+            </div>
+            <div class="navbar-nav ms-auto">
+                <form th:action="@{/perform_logout}" method="post" class="d-flex align-items-center">
+                    <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Comment Details</h2>
+        <div class="card">
+            <div class="card-body">
+                <p class="card-text" th:text="${comment.text}"></p>
+                <p class="card-text"><strong>Book:</strong>
+                    <a th:href="@{/books/view/{id}(id=${comment.book.id})}" th:text="${comment.book.title}"></a>
+                </p>
+                <p class="card-text"><strong>Author:</strong> <span th:text="${comment.user.username}"></span></p>
+            </div>
+        </div>
+        <a th:href="@{/books/view/{id}(id=${comment.book.id})}" class="btn btn-secondary mt-3">Back to Book</a>
+        <div sec:authorize="hasRole('ADMIN') or #comment.user.username == authentication.name">
+            <a th:href="@{/comments/edit/{id}(id=${comment.id})}" class="btn btn-warning mt-3">Edit Comment</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
