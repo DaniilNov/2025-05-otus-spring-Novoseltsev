@@ -5,28 +5,28 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.stereotype.Component;
-import ru.otus.hw.batch.model.BookProcessingWrapper;
+import ru.otus.hw.batch.model.AuthorProcessingWrapper;
 import ru.otus.hw.service.TemporaryMappingService;
 
 @Component
 @RequiredArgsConstructor
-public class BookItemWriter implements ItemWriter<BookProcessingWrapper> {
+public class AuthorItemWriter implements ItemWriter<AuthorProcessingWrapper> {
 
     private final EntityManager entityManager;
 
     private final TemporaryMappingService temporaryMappingService;
 
     @Override
-    public void write(Chunk<? extends BookProcessingWrapper> chunk) {
-        for (BookProcessingWrapper wrapper : chunk) {
-            entityManager.persist(wrapper.getJpaBook());
+    public void write(Chunk<? extends AuthorProcessingWrapper> chunk) {
+        for (AuthorProcessingWrapper wrapper : chunk) {
+            entityManager.persist(wrapper.getJpaAuthor());
         }
         entityManager.flush();
 
-        for (BookProcessingWrapper wrapper : chunk) {
-            temporaryMappingService.addBookMapping(
-                    wrapper.getMongoBook().getId(),
-                    wrapper.getJpaBook().getId()
+        for (AuthorProcessingWrapper wrapper : chunk) {
+            temporaryMappingService.addAuthorMapping(
+                    wrapper.getMongoAuthor().getId(),
+                    wrapper.getJpaAuthor().getId()
             );
         }
 

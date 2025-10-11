@@ -9,9 +9,6 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
-import ru.otus.hw.service.AuthorMappingService;
-import ru.otus.hw.service.GenreMappingService;
-import ru.otus.hw.service.PreloadService;
 import ru.otus.hw.service.TemporaryMappingService;
 
 @ShellComponent
@@ -23,20 +20,11 @@ public class BatchCommands {
 
     private final Job migrateLibraryJob;
 
-    private final PreloadService preloadService;
-
-    private final AuthorMappingService authorMappingService;
-
-    private final GenreMappingService genreMappingService;
-
     private final TemporaryMappingService temporaryMappingService;
 
     @ShellMethod(value = "Start migration from MongoDB to H2", key = {"migrate", "start-migration"})
     public String startMigration() {
         try {
-            preloadService.preloadAuthorsAndGenres();
-            authorMappingService.loadAuthorsToCache();
-            genreMappingService.loadGenresToCache();
             temporaryMappingService.clear();
 
             JobParameters jobParameters = new JobParametersBuilder()

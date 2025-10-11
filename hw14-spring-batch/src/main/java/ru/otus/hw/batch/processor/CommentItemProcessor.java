@@ -19,7 +19,7 @@ public class CommentItemProcessor implements ItemProcessor<ru.otus.hw.models.mon
     @Override
     public Comment process(ru.otus.hw.models.mongo.Comment mongoComment) {
         String mongoBookId = mongoComment.getBook().getId();
-        Long bookJpaId = temporaryMappingService.getJpaIdByMongoId(mongoBookId);
+        Long bookJpaId = temporaryMappingService.getBookJpaIdByMongoId(mongoBookId);
 
         if (bookJpaId == null) {
             throw new IllegalStateException("Book JPA ID not found for MongoDB ID: " + mongoBookId);
