@@ -2,7 +2,18 @@ spring:
   data:
     mongodb:
      uri: mongodb://localhost:27017/maindb
+
 logging:
   level:
     org.springframework.data.mongodb: DEBUG
+  file:
+    name: logs/app.log
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,logfile
+  endpoint:
+    health:
+      show-details: always
