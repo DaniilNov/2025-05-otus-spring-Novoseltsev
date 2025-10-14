@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: hw17-docker:latest
+    container_name: hw17-shell-app
+    stdin_open: true
+    tty: true
+    environment:
+      SPRING_DATA_MONGODB_URI: ${SPRING_DATA_MONGODB_URI:-mongodb://host.docker.internal:27017/maindb}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
