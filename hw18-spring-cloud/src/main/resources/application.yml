@@ -1,8 +1,40 @@
 spring:
   data:
     mongodb:
-     uri: mongodb://localhost:27017/maindb
+      uri: mongodb://localhost:27017/maindb
 logging:
   level:
     org.springframework.data.mongodb: DEBUG
 
+resilience4j:
+  ratelimiter:
+    instances:
+      mongoDbCalls:
+        limitForPeriod: 10
+        limitRefreshPeriod: 1s
+        timeoutDuration: 0
+        registerHealthIndicator: true
+        eventConsumerBufferSize: 100
+  timelimiter:
+    instances:
+      mongoDbCalls:
+        timeoutDuration: 1s
+        cancelRunningFuture: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,ratelimiters,ratelimiterevents,timelimiters,timelimiterevents
+  endpoint:
+    health:
+      show-details: always
+  health:
+    ratelimiters:
+      enabled: true
+    circuitbreakers:
+      enabled: false
+
+app:
+  resilience:
+    executor-pool-size: 16
