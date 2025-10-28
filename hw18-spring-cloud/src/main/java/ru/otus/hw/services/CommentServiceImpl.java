@@ -1,19 +1,23 @@
 package ru.otus.hw.services;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import ru.otus.hw.exceptions.EntityNotFoundException;
-import ru.otus.hw.exceptions.ServiceTemporarilyUnavailableException;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Comment;
 import ru.otus.hw.repositories.BookRepository;
 import ru.otus.hw.repositories.CommentRepository;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -22,68 +26,124 @@ public class CommentServiceImpl implements CommentService {
 
     private final BookRepository bookRepository;
 
-    private final ResilientExecutor resilientExecutor;
-
     @Transactional(readOnly = true)
+    @CircuitBreaker(name = "mongoDbCalls", fallbackMethod = "findByIdFallback")
+    @RateLimiter(name = "mongoDbCalls")
     @Override
     public Optional<Comment> findById(String id) {
-        return resilientExecutor.executeOrFallback(() -> commentRepository.findById(id), Optional::empty);
+        log.debug("Finding comment by id: {}", id);
+        return commentRepository.findById(id);
     }
 
     @Transactional(readOnly = true)
+    @CircuitBreaker(name = "mongoDbCalls", fallbackMethod = "findByBookIdFallback")
+    @RateLimiter(name = "mongoDbCalls")
     @Override
     public List<Comment> findByBookId(String bookId) {
-        return resilientExecutor.executeOrFallback(() -> commentRepository.findByBookId(bookId), Collections::emptyList);
+        log.debug("Finding comments by book id: {}", bookId);
+        return commentRepository.findByBookId(bookId);
     }
 
     @Transactional
+    @CircuitBreaker(name = "mongoDbCalls", fallbackMethod = "createFallback")
+    @RateLimiter(name = "mongoDbCalls")
     @Override
     public Comment create(String text, String bookId) {
-        Book book = resilientExecutor.executeOrFallback(
-                () -> bookRepository.findById(bookId)
-                        .orElseThrow(() -> new EntityNotFoundException("Book with id %s not found".formatted(bookId))),
-                () -> {
-                    throw new ServiceTemporarilyUnavailableException("Book lookup is temporarily unavailable");
-                }
-        );
+        log.debug("Creating comment for book id: {}", bookId);
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("Book with id %s not found".formatted(bookId)));
         Comment comment = new Comment();
         comment.setText(text);
         comment.setBook(book);
-        return resilientExecutor.executeOrFallback(
-                () -> commentRepository.save(comment),
-                () -> {
-                    throw new ServiceTemporarilyUnavailableException("Saving comment is temporarily unavailable");
-                }
-        );
+        return commentRepository.save(comment);
     }
 
     @Transactional
+    @CircuitBreaker(name = "mongoDbCalls", fallbackMethod = "updateFallback")
+    @RateLimiter(name = "mongoDbCalls")
     @Override
     public Comment update(String id, String text) {
-        Comment comment = resilientExecutor.executeOrFallback(
-                () -> commentRepository.findById(id)
-                        .orElseThrow(() -> new EntityNotFoundException("Comment with id %s not found".formatted(id))),
-                () -> {
-                    throw new ServiceTemporarilyUnavailableException("Comment lookup is temporarily unavailable");
-                }
-        );
+        log.debug("Updating comment id: {}", id);
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Comment with id %s not found".formatted(id)));
         comment.setText(text);
-        return resilientExecutor.executeOrFallback(
-                () -> commentRepository.save(comment),
-                () -> {
-                    throw new ServiceTemporarilyUnavailableException("Saving comment is temporarily unavailable");
-                }
-        );
+        return commentRepository.save(comment);
     }
 
     @Transactional
+    @CircuitBreaker(name = "mongoDbCalls", fallbackMethod = "deleteFallback")
+    @RateLimiter(name = "mongoDbCalls")
     @Override
     public void deleteById(String id) {
-        resilientExecutor.executeVoidOrFallback(
-                () -> commentRepository.deleteById(id),
-                () -> {
-                    throw new ServiceTemporarilyUnavailableException("Deleting comment is temporarily unavailable");
-                }
+        log.debug("Deleting comment by id: {}", id);
+        commentRepository.deleteById(id);
+    }
+
+    public Optional<Comment> findByIdFallback(String id, Throwable t) {
+        log.error("Fallback for findCommentById({}): {}", id, t.toString());
+        throw new ResponseStatusException(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "Comment lookup is temporarily unavailable. Please try again later.",
+                t
         );
+    }
+
+    public List<Comment> findByBookIdFallback(String bookId, Throwable t) {
+        log.error("Fallback for findByBookId({}): {}", bookId, t.toString());
+        throw new ResponseStatusException(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "Comments list is temporarily unavailable. Please try again later.",
+                t
+        );
+    }
+
+    public Comment createFallback(String text, String bookId, Throwable t) {
+        log.error("Fallback for create comment: {}", t.toString());
+        EntityNotFoundException enf = findEntityNotFound(t);
+        if (enf != null) {
+            throw enf;
+        }
+        throw new ResponseStatusException(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "Saving comment is temporarily unavailable. Please try again later.",
+                t
+        );
+    }
+
+    public Comment updateFallback(String id, String text, Throwable t) {
+        log.error("Fallback for update comment({}): {}", id, t.toString());
+        EntityNotFoundException enf = findEntityNotFound(t);
+        if (enf != null) {
+            throw enf;
+        }
+        throw new ResponseStatusException(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "Updating comment is temporarily unavailable. Please try again later.",
+                t
+        );
+    }
+
+    public void deleteFallback(String id, Throwable t) {
+        log.error("Fallback for deleteComment({}): {}", id, t.toString());
+        throw new ResponseStatusException(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "Deleting comment is temporarily unavailable. Please try again later.",
+                t
+        );
+    }
+
+    private static EntityNotFoundException findEntityNotFound(Throwable t) {
+        Throwable cur = t;
+        while (cur != null) {
+            if (cur instanceof EntityNotFoundException enf) {
+                return enf;
+            }
+            Throwable next = cur.getCause();
+            if (next == cur) {
+                break;
+            }
+            cur = next;
+        }
+        return null;
     }
 }

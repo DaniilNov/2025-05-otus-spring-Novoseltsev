@@ -157,8 +157,8 @@ class CommentServiceImplIntegrationTest {
     }
 
     @Test
-    @DisplayName("должен бросать EntityNotFoundException при попытке удалить несуществующий комментарий")
-    void shouldThrowEntityNotFoundExceptionWhenDeletingNonExistentComment() {
+    @DisplayName("не должен бросать исключение при попытке удалить несуществующий комментарий")
+    void shouldNotThrowWhenDeletingNonExistentComment() {
         assertThatNoException().isThrownBy(() -> commentService.deleteById("non-existent-id"));
     }
 }
