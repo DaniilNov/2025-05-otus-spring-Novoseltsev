@@ -1,0 +1,55 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/maindb
+
+resilience4j:
+  aspects:
+    circuitbreaker:
+      order: 1
+    ratelimiter:
+      order: 2
+    timelimiter:
+      order: 3
+
+  circuitbreaker:
+    instances:
+      mongoDbCalls:
+        register-health-indicator: true
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        minimum-number-of-calls: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+        ignore-exceptions:
+          - io.github.resilience4j.ratelimiter.RequestNotPermitted
+          - ru.otus.hw.exceptions.EntityNotFoundException
+
+  ratelimiter:
+    instances:
+      mongoDbCalls:
+        limitForPeriod: 10
+        limitRefreshPeriod: 1s
+        timeoutDuration: 0s
+
+  timelimiter:
+    instances:
+      mongoDbCalls:
+        timeoutDuration: 1s
+        cancelRunningFuture: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,circuitbreakers,ratelimiters
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    org.springframework.data.mongodb: DEBUG
+    io.github.resilience4j: DEBUG
