@@ -1,0 +1,67 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/taskflow_auth
+    username: postgres
+    password: postgres123
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 5
+      connection-timeout: 30000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      workflow-service:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 5s
+        permitted-number-of-calls-in-half-open-state: 3
+        register-health-indicator: true
+        event-consumer-buffer-size: 10
+      auth-service:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 5s
+        permitted-number-of-calls-in-half-open-state: 3
+        register-health-indicator: true
+        event-consumer-buffer-size: 10
+  retry:
+    instances:
+      workflow-service:
+        max-attempts: 3
+        wait-duration: 1s
+      auth-service:
+        max-attempts: 2
+        wait-duration: 1s
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, resilience4j.circuitbreaker.events
+  endpoint:
+    health:
+      show-details: always
+
+jwt:
+  secret: mySecretKeyThatIsAtLeast32CharactersLongAndMeetsHS256Requirements123
+  expiration: 86400000
+
+logging:
+  level:
+    org.springframework.jdbc: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.postgresql: DEBUG
